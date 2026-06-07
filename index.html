@@ -1,0 +1,3872 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>资产评估团队管理平台</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.0.0/fonts/remixicon.css">
+  <script src="https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@1.7.0/dist/cloudbase.full.js"></script>
+  <style>
+    :root {
+      --bg-main: #ffffff;
+      --bg-sidebar: #f9f9f9;
+      --bg-hover: #f0f0f0;
+      --bg-card: #fafafa;
+      --bg-code: #f4f4f4;
+      --border: #e5e5e5;
+      --text-primary: #1a1a1a;
+      --text-secondary: #555555;
+      --text-muted: #999999;
+      --accent: #2563eb;
+      --accent-light: #dbeafe;
+      --accent-hover: #1d4ed8;
+      --success: #16a34a;
+      --success-light: #dcfce7;
+      --warning: #d97706;
+      --warning-light: #fef3c7;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --sidebar-width: 260px;
+      --right-width: 300px;
+      --header-height: 56px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+      --shadow-lg: 0 4px 12px rgba(0,0,0,0.1);
+      --radius: 10px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ====== TOP HEADER ====== */
+    .top-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--header-height);
+      background: var(--bg-main);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 1000;
+      box-shadow: var(--shadow);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-left .logo {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .header-left .logo i {
+      font-size: 20px;
+      color: var(--accent);
+    }
+
+    .header-left .page-title {
+      font-size: 14px;
+      color: var(--text-muted);
+      padding-left: 16px;
+      border-left: 1px solid var(--border);
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header-right a {
+      padding: 6px 12px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .header-right a:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .header-right .icon-btn {
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+      border: none;
+      background: none;
+    }
+
+    .header-right .icon-btn:hover {
+      background: var(--bg-hover);
+    }
+
+    .header-right .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #60a5fa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    /* ====== LAYOUT ====== */
+    .page-layout {
+      display: flex;
+      margin-top: var(--header-height);
+      min-height: calc(100vh - var(--header-height));
+    }
+
+    /* ====== LEFT SIDEBAR ====== */
+    .left-sidebar {
+      width: var(--sidebar-width);
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: var(--header-height);
+      bottom: 0;
+      left: 0;
+      overflow-y: auto;
+      padding: 16px 0;
+    }
+
+    .nav-section {
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+
+    .nav-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 6px;
+      padding: 0 10px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 8px;
+      transition: all 0.2s;
+      margin-bottom: 2px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+      color: var(--text-muted);
+      transition: color 0.2s;
+    }
+
+    .nav-item:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .nav-item:hover i {
+      color: var(--text-secondary);
+    }
+
+    .nav-item.active {
+      background: var(--accent-light);
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .nav-item.active i {
+      color: var(--accent);
+    }
+
+    .nav-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: #fff;
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .nav-badge.green {
+      background: var(--success);
+    }
+
+    .nav-badge.orange {
+      background: var(--warning);
+    }
+
+    /* ====== MAIN CONTENT ====== */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      margin-right: var(--right-width);
+      padding: 32px 40px;
+      max-width: calc(100% - var(--sidebar-width) - var(--right-width));
+    }
+
+    .content-wrapper {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .page-header h1 i {
+      color: var(--accent);
+      font-size: 28px;
+    }
+
+    .page-header p {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .content-wrapper h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin-top: 36px;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .content-wrapper h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .content-wrapper p {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+    }
+
+    .content-wrapper ul, .content-wrapper ol {
+      margin-bottom: 14px;
+      padding-left: 22px;
+    }
+
+    .content-wrapper li {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .content-wrapper strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .content-wrapper a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .content-wrapper a:hover {
+      text-decoration: underline;
+    }
+
+    /* ====== CARDS ====== */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin: 20px 0;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-1px);
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 12px;
+    }
+
+    .card-icon.blue { background: var(--accent-light); color: var(--accent); }
+    .card-icon.green { background: var(--success-light); color: var(--success); }
+    .card-icon.orange { background: var(--warning-light); color: var(--warning); }
+    .card-icon.red { background: var(--danger-light); color: var(--danger); }
+
+    .card h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-primary);
+    }
+
+    .card p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .card .card-meta {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ====== INFO BOXES ====== */
+    .info-box {
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin: 20px 0;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .info-box.blue { background: var(--accent-light); border: 1px solid #bfdbfe; }
+    .info-box.green { background: var(--success-light); border: 1px solid #bbf7d0; }
+    .info-box.orange { background: var(--warning-light); border: 1px solid #fde68a; }
+    .info-box.red { background: var(--danger-light); border: 1px solid #fecaca; }
+
+    .info-box i {
+      font-size: 18px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .info-box.blue i { color: var(--accent); }
+    .info-box.green i { color: var(--success); }
+    .info-box.orange i { color: var(--warning); }
+    .info-box.red i { color: var(--danger); }
+
+    .info-box-content h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: var(--text-primary);
+    }
+
+    .info-box-content p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* ====== TEMPLATE BOX ====== */
+    .template-box {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin: 16px 0;
+    }
+
+    .template-box .template-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .template-box .template-header h4 {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .template-box .template-header h4 i {
+      color: var(--accent);
+    }
+
+    .copy-btn {
+      font-size: 12px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .template-content {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      font-family: inherit;
+    }
+
+    /* ====== FORM ELEMENTS ====== */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-primary);
+      background: var(--bg-main);
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+
+    .btn-success:hover {
+      background: #15803d;
+    }
+
+    /* ====== CHECKLIST ====== */
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .checklist li:last-child {
+      border-bottom: none;
+    }
+
+    .checklist input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .checklist label {
+      font-size: 14px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .checklist input:checked + label {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    /* ====== TABLE ====== */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 13px;
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .data-table th {
+      font-weight: 600;
+      color: var(--text-primary);
+      background: var(--bg-sidebar);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .data-table td {
+      color: var(--text-secondary);
+    }
+
+    .data-table tr:hover td {
+      background: var(--bg-hover);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .status-badge.done { background: var(--success-light); color: var(--success); }
+    .status-badge.pending { background: var(--warning-light); color: var(--warning); }
+    .status-badge.urgent { background: var(--danger-light); color: var(--danger); }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-yx { background: #d1fae5; color: #065f46; }
+    .badge-dz { background: #fef3c7; color: #92400e; }
+    .badge-zf { background: #dbeafe; color: #1e40af; }
+
+    /* ====== TAG ====== */
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-right: 4px;
+    }
+
+    .tag-blue { background: var(--accent-light); color: var(--accent); }
+    .tag-green { background: var(--success-light); color: var(--success); }
+    .tag-orange { background: var(--warning-light); color: var(--warning); }
+    .tag-red { background: var(--danger-light); color: var(--danger); }
+    .tag-gray { background: var(--bg-hover); color: var(--text-muted); }
+
+    /* ====== COLLAPSIBLE ====== */
+    .collapsible {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin: 12px 0;
+      overflow: hidden;
+    }
+
+    .collapsible-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: var(--bg-card);
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      user-select: none;
+    }
+
+    .collapsible-header:hover {
+      background: var(--bg-hover);
+    }
+
+    .collapsible-header i {
+      transition: transform 0.2s;
+      color: var(--text-muted);
+    }
+
+    .collapsible.open .collapsible-header i {
+      transform: rotate(180deg);
+    }
+
+    .collapsible-body {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      padding: 0 16px;
+    }
+
+    .collapsible.open .collapsible-body {
+      max-height: 2000px;
+      padding: 0 16px 16px;
+    }
+
+    /* ====== DIVIDER ====== */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 28px 0;
+    }
+
+    /* ====== RIGHT SIDEBAR ====== */
+    .right-sidebar {
+      width: var(--right-width);
+      background: var(--bg-main);
+      border-left: 1px solid var(--border);
+      position: fixed;
+      top: var(--header-height);
+      bottom: 0;
+      right: 0;
+      overflow-y: auto;
+      padding: 20px 16px;
+    }
+
+    .right-section {
+      margin-bottom: 24px;
+    }
+
+    .right-section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .right-section-title a {
+      font-size: 11px;
+      color: var(--accent);
+      text-decoration: none;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .right-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .right-item:last-child {
+      border-bottom: none;
+    }
+
+    .right-item-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .right-item-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .right-item-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .right-item-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .right-item-time {
+      font-size: 11px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-row .stat-value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* ====== WISHLIST ITEM ====== */
+    .wishlist-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      margin-bottom: 10px;
+    }
+
+    .wishlist-item .wish-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .wishlist-item .wish-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .wishlist-item .wish-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .wishlist-item .wish-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .vote-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+
+    .vote-btn:hover {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .vote-btn.voted {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ====== SCROLLBAR ====== */
+    ::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #9ca3af;
+    }
+
+    /* ====== HIDE/SHOW ====== */
+    .page-section {
+      display: none;
+    }
+
+    .page-section.active {
+      display: block;
+    }
+
+    /* ====== RESPONSIVE ====== */
+    @media (max-width: 1200px) {
+      .right-sidebar {
+        display: none;
+      }
+      .main-content {
+        margin-right: 0;
+        max-width: calc(100% - var(--sidebar-width));
+      }
+    }
+
+    @media (max-width: 768px) {
+      .left-sidebar {
+        display: none;
+      }
+      .main-content {
+        margin-left: 0;
+        padding: 20px 16px;
+        max-width: 100%;
+      }
+    }
+
+    /* ====== DAILY REPORT PREVIEW ====== */
+    .report-preview {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin: 16px 0;
+    }
+
+    .report-preview h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .report-preview h4 i {
+      color: var(--accent);
+    }
+
+    .report-section {
+      margin-bottom: 14px;
+    }
+
+    .report-section-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .report-section-content {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+      padding-left: 12px;
+      border-left: 2px solid var(--border);
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--text-primary);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 14px;
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ====== KANBAN BOARD ====== */
+    .kanban-board {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-top: 20px;
+    }
+
+    .kanban-column {
+      min-width: 260px;
+      flex: 1;
+      background: var(--bg-sidebar);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      max-height: calc(100vh - 220px);
+    }
+
+    .kanban-column-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .kanban-column-header .count {
+      background: var(--bg-hover);
+      color: var(--text-muted);
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+
+    .kanban-column-body {
+      padding: 12px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .kanban-card {
+      background: var(--bg-main);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 10px;
+      cursor: grab;
+      transition: all 0.2s;
+    }
+
+    .kanban-card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+
+    .kanban-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .kanban-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    .kanban-card-client {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .kanban-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .kanban-card-owner {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .kanban-card-owner .avatar-small {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), #60a5fa);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 500;
+    }
+
+    .kanban-card-deadline {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .kanban-card-deadline.urgent {
+      color: var(--danger);
+      font-weight: 500;
+    }
+
+    .kanban-progress {
+      margin-top: 8px;
+    }
+
+    .kanban-progress-bar {
+      height: 6px;
+      background: var(--bg-hover);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .kanban-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), #60a5fa);
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    .kanban-progress-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .kanban-card-tags {
+      display: flex;
+      gap: 6px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .column-todo .kanban-column-header { border-bottom-color: #bfdbfe; }
+    .column-doing .kanban-column-header { border-bottom-color: #fde68a; }
+    .column-review .kanban-column-header { border-bottom-color: #fed7aa; }
+    .column-done .kanban-column-header { border-bottom-color: #bbf7d0; }
+
+    /* ====== KANBAN ACTIONS ====== */
+    .kanban-actions {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .kanban-actions .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-main);
+      color: var(--text-primary);
+      transition: all 0.2s;
+    }
+
+    .kanban-actions .btn:hover {
+      background: var(--bg-hover);
+    }
+
+    .kanban-actions .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .kanban-actions .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+
+    .kanban-card-actions {
+      display: none;
+      gap: 6px;
+      position: absolute;
+      top: 8px;
+      right: 8px;
+    }
+
+    .kanban-card {
+      position: relative;
+    }
+
+    .kanban-card:hover .kanban-card-actions {
+      display: flex;
+    }
+
+    .kanban-card-actions button {
+      width: 24px;
+      height: 24px;
+      border-radius: 4px;
+      border: none;
+      background: var(--bg-hover);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+
+    .kanban-card-actions button:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    /* ====== MODAL ====== */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--bg-main);
+      border-radius: var(--radius);
+      width: 520px;
+      max-width: 90vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.95);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.show .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-header h3 {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: none;
+      background: var(--bg-hover);
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .modal-close:hover {
+      background: var(--danger-light);
+      color: var(--danger);
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      background: var(--bg-main);
+      color: var(--text-primary);
+      font-family: inherit;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-light);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 12px 20px 20px;
+    }
+
+    .modal-footer .btn {
+      padding: 8px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-main);
+      color: var(--text-primary);
+    }
+
+    .modal-footer .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    .modal-footer .btn-danger {
+      background: var(--danger);
+      color: #fff;
+      border-color: var(--danger);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 30px 16px;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .empty-state i {
+      font-size: 32px;
+      margin-bottom: 8px;
+      display: block;
+      opacity: 0.4;
+    }
+
+    /* ====== HEADER SEARCH ====== */
+    .header-search {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .header-search i.ri-search-line {
+      position: absolute;
+      left: 10px;
+      color: var(--text-muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+    .header-search input {
+      width: 220px;
+      padding: 7px 28px 7px 32px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      background: var(--bg-sidebar);
+      color: var(--text-primary);
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+    .header-search input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--bg-main);
+      width: 280px;
+    }
+    .header-search input::placeholder {
+      color: var(--text-muted);
+    }
+    .search-clear {
+      position: absolute;
+      right: 6px;
+      width: 20px;
+      height: 20px;
+      border: none;
+      background: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      border-radius: 4px;
+    }
+    .search-clear:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    /* ====== TOC NAVIGATION ====== */
+    .toc-container {
+      padding: 4px 0;
+    }
+    .toc-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
+      padding: 0 4px;
+    }
+    .toc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .toc-item {
+      margin: 0;
+      padding: 0;
+    }
+    .toc-item a {
+      display: block;
+      padding: 5px 8px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.15s;
+      line-height: 1.45;
+      cursor: pointer;
+    }
+    .toc-item a:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+    .toc-item a.active {
+      background: var(--accent-light);
+      color: var(--accent);
+      font-weight: 500;
+    }
+    .toc-item.level-h2 a {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+    .toc-item.level-h3 a {
+      padding-left: 18px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .toc-empty {
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 8px;
+      text-align: center;
+    }
+
+    /* ====== SEARCH HIGHLIGHT ====== */
+    .search-highlight {
+      background: #fef08a;
+      color: #854d0e;
+      padding: 1px 2px;
+      border-radius: 3px;
+    }
+
+    /* ====== SMOOTH SCROLL ====== */
+    html {
+      scroll-behavior: smooth;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ====== TOAST ====== -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ====== TOP HEADER ====== -->
+  <header class="top-header">
+    <div class="header-left">
+      <div class="logo">
+        <i class="ri-building-2-line"></i>
+        <span>资产评估团队管理平台</span>
+      </div>
+      <div class="page-title" id="headerPageTitle">项目概览</div>
+    </div>
+
+    <div class="header-right">
+      <div class="header-search">
+        <i class="ri-search-line"></i>
+        <input type="text" id="globalSearch" placeholder="搜索当前页面..." onkeydown="if(event.key==='Enter')performSearch()">
+        <button class="search-clear" id="searchClear" onclick="clearSearch()" style="display:none;"><i class="ri-close-line"></i></button>
+      </div>
+      <a href="#"><i class="ri-notification-3-line"></i></a>
+      <button class="icon-btn" title="切换主题" id="themeToggle">
+        <i class="ri-sun-line"></i>
+      </button>
+      <div class="avatar">管</div>
+    </div>
+  </header>
+
+  <!-- ====== MAIN LAYOUT ====== -->
+  <div class="page-layout">
+
+    <!-- ====== LEFT SIDEBAR ====== -->
+    <aside class="left-sidebar">
+      <div class="nav-section">
+        <div class="nav-section-title">工作区</div>
+        <button class="nav-item active" data-page="overview" onclick="switchPage('overview')">
+          <i class="ri-dashboard-line"></i>
+          <span>项目概览</span>
+        </button>
+        <button class="nav-item" data-page="report" onclick="switchPage('report')">
+          <i class="ri-file-list-3-line"></i>
+          <span>项目汇报</span>
+          <span class="nav-badge green">3</span>
+        </button>
+        <button class="nav-item" data-page="help" onclick="switchPage('help')">
+          <i class="ri-questionnaire-line"></i>
+          <span>问题求助</span>
+          <span class="nav-badge orange">5</span>
+        </button>
+        <button class="nav-item" data-page="risk" onclick="switchPage('risk')">
+          <i class="ri-shield-check-line"></i>
+          <span>风控对接</span>
+        </button>
+        <button class="nav-item" data-page="board" onclick="switchPage('board')">
+          <i class="ri-kanban-view-2"></i>
+          <span>项目看板</span>
+          <span class="nav-badge green">8</span>
+        </button>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">协作</div>
+        <button class="nav-item" data-page="daily" onclick="switchPage('daily')">
+          <i class="ri-newspaper-line"></i>
+          <span>群日报</span>
+        </button>
+        <button class="nav-item" data-page="wishlist" onclick="switchPage('wishlist')">
+          <i class="ri-heart-add-line"></i>
+          <span>心愿墙</span>
+          <span class="nav-badge">12</span>
+        </button>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">管理</div>
+        <button class="nav-item" data-page="team" onclick="switchPage('team')">
+          <i class="ri-team-line"></i>
+          <span>团队管理</span>
+          <span class="nav-badge green" id="teamBadge">21</span>
+        </button>
+        <button class="nav-item" data-page="training" onclick="switchPage('training')">
+          <i class="ri-book-open-line"></i>
+          <span>培训计划</span>
+        </button>
+        <button class="nav-item" data-page="settings" onclick="switchPage('settings')">
+          <i class="ri-settings-3-line"></i>
+          <span>设置</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- ====== MAIN CONTENT ====== -->
+    <main class="main-content">
+
+      <!-- ========== PAGE: OVERVIEW ========== -->
+      <div class="page-section active" id="page-overview">
+        <div class="content-wrapper">
+          <div class="page-header">
+            <h1><i class="ri-dashboard-line"></i>项目概览</h1>
+            <p>帮助团队快速了解项目背景，标准化项目信息传达</p>
+          </div>
+
+          <div class="card-grid">
+            <div class="card" style="cursor:pointer;" onclick="switchPage('board')">
+              <div class="card-icon blue"><i class="ri-briefcase-4-line"></i></div>
+              <h4>进行中的项目</h4>
+              <p>当前团队共有 8 个项目在进行中</p>
+              <div class="card-meta"><i class="ri-time-line"></i> 更新于 10 分钟前</div>
+            </div>
+            <div class="card" style="cursor:pointer;" onclick="switchPage('team')">
+              <div class="card-icon green"><i class="ri-team-line"></i></div>
+              <h4>团队成员</h4>
+              <p>20 名成员，其中 12 名助理人员</p>
+              <div class="card-meta"><i class="ri-user-add-line"></i> 本月新增 2 人</div>
+            </div>
+            <div class="card" style="cursor:pointer;" onclick="switchPage('help')">
+              <div class="card-icon orange"><i class="ri-alarm-warning-line"></i></div>
+              <h4>待处理问题</h4>
+              <p>5 个问题等待解决，其中 2 个紧急</p>
+              <div class="card-meta"><i class="ri-flag-line"></i> 需今日处理</div>
+            </div>
+            <div class="card" style="cursor:pointer;" onclick="switchPage('board')">
+              <div class="card-icon red"><i class="ri-calendar-check-line"></i></div>
+              <h4>本周截止</h4>
+              <p>3 个项目报告即将到期</p>
+              <div class="card-meta"><i class="ri-time-line"></i> 最近 3 天</div>
+            </div>
+          </div>
+
+          <h2><i class="ri-file-info-line"></i>项目背景了解指南</h2>
+          <p>作为助理人员，接到新项目时，请按照以下步骤快速了解项目背景：</p>
+
+          <div class="info-box blue">
+            <i class="ri-lightbulb-line"></i>
+            <div class="info-box-content">
+              <h4>核心原则</h4>
+              <p>了解项目背景不是看完资料就行，而是要能用自己的话把项目说清楚。如果你不能简洁地概括这个项目，说明还没真正理解。</p>
+            </div>
+          </div>
+
+          <h3>第一步：阅读项目基础资料</h3>
+          <ul>
+            <li><strong>业务约定书</strong>：了解评估目的、评估对象、评估范围</li>
+            <li><strong>委托方提供的资料清单</strong>：了解已获取和待获取的资料</li>
+            <li><strong>项目立项表</strong>：了解项目预算、时间节点、人员分工</li>
+            <li><strong>历史工作底稿</strong>：如有续作，先看过往报告和底稿</li>
+          </ul>
+
+          <h3>第二步：理清关键信息（用 5W1H）</h3>
+          <div class="template-box">
+            <div class="template-header">
+              <h4><i class="ri-question-answer-line"></i>项目背景五问</h4>
+              <button class="copy-btn" onclick="copyTemplate(this)"><i class="ri-file-copy-line"></i> 复制</button>
+            </div>
+            <div class="template-content">1. What（评什么）：评估对象是什么？资产类型？
+2. Why（为什么评）：评估目的是什么？交易？抵押？财务报告？
+3. Who（委托方是谁）：委托方背景？是否有特殊要求？
+4. When（时间节点）：基准日？报告日？何时需要提交？
+5. Where（资产在哪）：资产分布？是否需要现场勘查？
+6. How（怎么评）：评估方法？是否有特殊技术难点？</div>
+          </div>
+
+          <h3>第三步：识别项目风险点</h3>
+          <ul>
+            <li>资产是否存在权属瑕疵？</li>
+            <li>评估目的是否涉及关联交易？</li>
+            <li>是否有历史遗留问题需要关注？</li>
+            <li>时间是否充裕？是否存在赶报告风险？</li>
+            <li>委托方是否有特别的要求或期望？</li>
+          </ul>
+
+          <h2><i class="ri-file-list-2-line"></i>项目信息卡片模板</h2>
+          <p>每个项目请在启动时填写此卡片，存放在共享文件夹中，方便所有成员查阅：</p>
+
+          <div class="template-box">
+            <div class="template-header">
+              <h4><i class="ri-article-line"></i>项目信息卡片</h4>
+              <button class="copy-btn" onclick="copyTemplate(this)"><i class="ri-file-copy-line"></i> 复制</button>
+            </div>
+            <div class="template-content">【项目名称】：
+【委托方】：
+【评估目的】：
+【评估对象】：
+【评估基准日】：
+【报告日要求】：
+【项目负责人】：
+【项目组成员】：
+【资产类型】：□房地产 □机器设备 □无形资产 □企业价值 □其他
+【项目难点】：
+【风险提示】：
+【已获取资料】：
+【待获取资料】：
+【下一步计划】：</div>
+          </div>
+
+          <div class="info-box green">
+            <i class="ri-checkbox-circle-line"></i>
+            <div class="info-box-content">
+              <h4>检查清单</h4>
+              <p>项目启动后，请在 24 小时内完成以上信息收集，并在群里同步"项目已了解，关键信息如下..."</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== PAGE: REPORT ========== -->
+      <div class="page-section" id="page-report">
+        <div class="content-wrapper">
+          <div class="page-header">
+            <h1><i class="ri-file-list-3-line"></i>项目汇报</h1>
+            <p>标准化汇报模板，让信息传达更高效</p>
+          </div>
+
+          <div class="info-box blue">
+            <i class="ri-information-line"></i>
+            <div class="info-box-content">
+              <h4>汇报原则</h4>
+              <p>汇报不是记流水账，而是要让领导快速知道：项目进展到哪了？遇到了什么问题？需要什么支持？下一步做什么？</p>
+            </div>
+          </div>
+
+          <h2><i class="ri-calendar-line"></i>日报模板</h2>
+          <p>每天下班前在群里发送，格式如下：</p>
+
+          <div class="template-box">
+            <div class="template-header">
+              <h4><i class="ri-sun-line"></i>今日日报模板</h4>
+              <button class="copy-btn" onclick="copyTemplate(this)"><i class="ri-file-copy-line"></i> 复制</button>
+            </div>
+            <div class="template-content">📋 【XX项目】日报 - 汇报人：XXX
+
+✅ 今日完成：
+1. 
+2. 
+3. 
+
+⚠️ 遇到的问题：
+1. 
+2. 
+
+🤔 需要的支持：
+1. 
+
+📅 明日计划：
+1. 
+2. 
+
+⏰ 项目进度：XX%（预计X月X日完成）</div>
+          </div>
+
+          <h2><i class="ri-calendar-week-line"></i>周报模板</h2>
+          <p>每周五下午发送，汇总一周工作：</p>
+
+          <div class="template-box">
+            <div class="template-header">
+              <h4><i class="ri-calendar-event-line"></i>本周周报模板</h4>
+              <button class="copy-btn" onclick="copyTemplate(this)"><i class="ri-file-copy-line"></i> 复制</button>
+            </div>
+            <div class="template-content">📊 【XX项目】周报（X月X日-X月X日）- 汇报人：XXX
+
+一、本周工作完成情况
+1. 
+2. 
+3. 
+
+二、关键成果
+- 
+- 
+
+三、遇到的问题及解决方案
+1. 问题：XXX → 解决方案：XXX
+2. 问题：XXX → 解决方案：XXX
+
+四、下周工作计划
+1. 
+2. 
+3. 
+
+五、风险提示
+- 
+
+六、需要协调的事项
+- </div>
+          </div>
+
+          <h2><i class="ri-error-warning-line"></i>问题升级汇报</h2>
+          <p>当遇到以下情况时，请立即单独汇报（不要在群里发）：</p>
+          <ul>
+            <li>发现重大资产权属瑕疵</li>
+            <li>委托方要求与执业准则冲突</li>
+            <li>时间进度严重滞后可能影响报告日</li>
+            <li>需要额外费用或人员支持</li>
+            <li>与委托方沟通出现障碍</li>
+          </ul>
+
+          <div class="template-box">
+            <div class="template-header">
+              <h4><i class="ri-alarm-warning-line"></i>问题升级模板</h4>
+              <button class="copy-btn" onclick="copyTemplate(this)"><i class="ri-file-copy-line"></i> 复制</button>
+            </div>
+            <div class="template-content">🚨 【紧急】XX项目问题汇报 - 汇报人：XXX
+
+【问题概述】：（一句话描述问题）
+
+【问题详情】：
+- 发现时间：
+- 涉及资产/金额：
+- 影响程度：□轻微 □中等 □严重
+
+【已采取的措施】：
+1. 
+2. 
+
+【建议解决方案】：
+1. 
+2. 
+
+【需要的支持】：
+- 
+
+【时间紧迫性】：□今日需解决 □本周内解决 □可延后</div>
+          </div>
+
+          <h2><i class="ri-check-double-line"></i>汇报检查清单</h2>
+          <ul class="checklist">
+            <li><input type="checkbox" id="r1"><label for="r1">是否在下班前发送了日报？</label></li>
+            <li><input type="checkbox" id="r2"><label for="r2">日报是否包含"完成/问题/计划"三部分？</label></li>
+            <li><input type="checkbox" id="r3"><label for="r3">遇到问题是否先尝试自己解决？</label></li>
+            <li><input type="checkbox" id="r4"><label for="r4">紧急问题是否单独私聊领导？</label></li>
+            <li><input type="checkbox" id="r5"><label for="r5">周报是否在周五下午发送？</label></li>
+            <li><input type="checkbox" id="r6"><label for="r6">汇报前是否检查了数据准确性？</label></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ========== PAGE: HELP ========== -->
+      <div class="page-section" id="page-help">
+        <div class="content-wrapper">
+          <div class="page-header">
+            <h1><i class="ri-questionnaire-line"></i>问题求助</h1>
+            <p>有问题先查知识库，找不到再提问，提问要有方法</p>
+          </div>
+
+          <div class="info-box orange">
+            <i class="ri-lightbulb-line"></i>
+            <div class="info-box-content">
+              <h4>提问的艺术</h4>
+              <p>好问题 = 节省时间。在提问之前，请先说明：你遇到了什么？你尝试了哪些方法？你期望的结果是什么？</p>
+            </div>
+          </div>
+
+          <h2><i class="ri-search-line"></i>常见问题速查</h2>
+
+          <div class="collapsible open">
+            <div class="collapsible-header" onclick="toggleCollapse(this)">
+              <span><i class="ri-building-line" style="margin-right:6px;color:var(--accent)"></i>房地产评估常见问题</span>
+              <i class="ri-arrow-down-s-line"></i>
+            </div>
+            <div class="collapsible-body">
+              <ul>
+                <li><strong>土地性质如何确定？</strong> → 查阅土地出让合同、房产证、不动产权证，必要时到自然资源局查询</li>
+                <li><strong>容积率怎么算？</strong> → 建筑面积÷用地面积，以规划许可证为准</li>
+                <li><strong>收益法租金怎么取？</strong> → 查周边同类物业实际成交租金，至少取3个可比案例</li>
+                <li><strong>抵押评估需要注意什么？</strong> → 法定优先受偿款、查封情况、租赁情况必须核查</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="collapsible">
+            <div class="collapsible-header" onclick="toggleCollapse(this)">
+              <span><i class="ri-server-line" style="margin-right:6px;color:var(--success)"></i>机器设备评估常见问题</span>
+              <i class="ri-arrow-down-s-line"></i>
+            </div>
+            <div class="collapsible-body">
+              <ul>
+                <li><strong>设备折旧年限怎么确定？</strong> → 参考企业所得税法规定年限，结合设备实际使用状况</li>
+                <li><strong>进口设备汇率怎么取？</strong> → 以基准日中国人民银行公布的外汇牌价中间价为准</li>
+                <li><strong>自制设备怎么评？</strong> → 重置核算法：材料费+人工费+制造费用+合理利润</li>
+                <li><strong>设备已停用还能评吗？</strong> → 可以，但需关注实体性贬值和经济性贬值</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="collapsible">
+            <div class="collapsible-header" onclick="toggleCollapse(this)">
+              <span><i class="ri-copyright-line" style="margin-right:6px;color:var(--warning)"></i>无形资产评估常见问题</span>
+              <i class="ri-arrow-down-s-line"></i>
+            </div>
+            <div class="collapsible-body">
+              <ul>
+                <li><strong>专利有效期怎么算？</strong> → 发明专利20年、实用新型10年、外观设计15年，自申请日起算</li>
+                <li><strong>商标评估要注意什么？</strong> → 是否续展、是否存在质押、许可使用情况</li>
+                <li><strong>软件著作权怎么评？</strong> → 成本法或收益法，需了解开发成本或预期收益</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="collapsible">
+            <div class="collapsible-header" onclick="toggleCollapse(this)">
+              <span><i class="ri-briefcase-line" style="margin-right:6px;color:var(--danger)"></i>企业价值评估常见问题</span>
+              <i class="ri-arrow-down-s-line"></i>
+            </div>
+            <div class="collapsible-body">
+              <ul>
+                <li><strong>收益法折现率怎么确定？</strong> → WACC或CAPM模型，参数需有依据</li>
+                <li><strong>非经营性资产怎么剥离？</strong> → 单独识别、单独评估，在结论中加减</li>
+                <li><strong>溢余资产是什么？</strong> → 超过正常经营需要的资产，如多余现金、闲置房产</li>
+                <li><strong>控股权溢价怎么考虑？</strong> → 需根据具体交易背景分析，一般在市场法收益法中考虑</li>
+              </ul>
+            </div>
+          </div>
+
+          <h2><i class="ri-question-line"></i>提问模板</h2>
+
+          <div class="template-box">
+            <div class="template-header">
+              <h4><i class="ri-message-3-line"></i>如何向领导提问</h4>
+              <button class="copy-btn" onclick="copyTemplate(this)"><i class="ri-file-copy-line"></i> 复制</button>
+            </div>
+            <div class="template-content">【项目】XX项目
+【问题】一句话描述问题
+【背景】
+- 这个问题是在什么情况下出现的？
+- 涉及哪些资产/数据？
+
+【已尝试的解决方法】
+1. 
+2. 
+
+【期望得到的帮助】
+- 是需要确认做法？还是需要技术支持？还是需要协调资源？
+
+【建议方案】（可选）
+- 我的想法是...你觉得可以吗？</div>
+          </div>
+
+          <h2><i class="ri-customer-service-line"></i>问题提交</h2>
+          <p>如果知识库里没找到答案，请在此提交问题：</p>
+
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+            <div class="form-group">
+              <label>问题类型</label>
+              <select id="qType">
+                <option>技术问题</option>
+                <option>流程问题</option>
+                <option>客户沟通问题</option>
+                <option>软件操作问题</option>
+                <option>其他</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>涉及项目</label>
+              <input type="text" placeholder="请输入项目名称">
+            </div>
+            <div class="form-group">
+              <label>问题描述</label>
+              <textarea placeholder="请详细描述你遇到的问题，包括已尝试的解决方法..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="showToast('问题已提交，负责人会尽快回复！')"><i class="ri-send-plane-line"></i> 提交问题</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== PAGE: RISK ========== -->
+      <div class="page-section" id="page-risk">
+        <div class="content-wrapper">
+          <div class="page-header">
+            <h1><i class="ri-shield-check-line"></i>风控对接</h1>
+            <p>与风控部的高效协作指南和检查清单</p>
+          </div>
+
+          <div class="info-box red">
+            <i class="ri-error-warning-line"></i>
+            <div class="info-box-content">
+              <h4>重要提醒</h4>
+              <p>风控检查不是"找茬"，而是帮助我们发现执业过程中的盲点和风险。请积极配合，认真对待每一条意见。</p>
+            </div>
+          </div>
+
+          <h2><i class="ri-list-check-2"></i>报告出具前自查清单</h2>
+          <p>提交风控部审核前，请务必逐项自查：</p>
+
+          <h3>一、形式审查</h3>
+          <ul class="checklist">
+            <li><input type="checkbox" id="f1"><label for="f1">报告封面信息是否完整（项目名称、报告编号、报告日）</label></li>
+            <li><input type="checkbox" id="f2"><label for="f2">签字盖章页是否齐全（签字评估师、机构公章）</label></li>
+            <input type="checkbox" id="f3"><label for="f3">报告页码是否连续，目录是否与正文对应</label></li>
+            <li><input type="checkbox" id="f4"><label for="f4">附件清单是否完整，附件是否已附</label></li>
+            <li><input type="checkbox" id="f5"><label for="f5">报告中数字、日期、金额是否前后一致</label></li>
+          </ul>
+
+          <h3>二、内容审查</h3>
+          <ul class="checklist">
+            <li><input type="checkbox" id="c1"><label for="c1">评估目的是否明确？是否与业务约定书一致？</label></li>
+            <li><input type="checkbox" id="c2"><label for="c2">评估基准日、报告日是否正确？</label></li>
+            <li><input type="checkbox" id="c3"><label for="c3">评估方法选择是否有充分依据？</label></li>
+            <li><input type="checkbox" id="c4"><label for="c4">重要参数（折现率、成新率等）是否有测算过程？</label></li>
+            <li><input type="checkbox" id="c5"><label for="c5">特别事项说明是否完整？</label></li>
+            <li><input type="checkbox" id="c6"><label for="c6">限制使用说明是否已注明？</label></li>
+            <li><input type="checkbox" id="c7"><label for="c7">期后重大事项是否已披露？</label></li>
+          </ul>
+
+          <h3>三、底稿审查</h3>
+          <ul class="checklist">
+            <li><input type="checkbox" id="d1"><label for="d1">底稿目录是否完整？索引是否清晰？</label></li>
+            <li><input type="checkbox" id="d2"><label for="d2">现场勘查记录是否有签字确认？</label></li>
+            <li><input type="checkbox" id="d3"><label for="d3">权属资料复印件是否与原件核对？</label></li>
+            <li><input type="checkbox" id="d4"><label for="d4">询价记录是否完整（至少3个来源）？</label></li>
+            <li><input type="checkbox" id="d5"><label for="d5">计算表公式是否检查无误？</label></li>
+          </ul>
+
+          <h2><i class="ri-exchange-line"></i>与风控部沟通流程</h2>
+
+          <div class="template-box">
+            <div class="template-header">
+              <h4><i class="ri-flow-chart"></i>风控对接流程</h4>
+              <button class="copy-btn" onclick="copyTemplate(this)"><i class="ri-file-copy-line"></i> 复制</button>
+            </div>
+            <div class="template-content">【提交前】
+1. 完成自查清单
+2. 确保报告和底稿完整
+3. 填写《报告提交审批表》
+
+【提交时】
+1. 提交电子版报告（Word+PDF）
+2. 提交完整底稿扫描件
+3. 附上自查清单（已勾选）
+
+【审核中】
+1. 保持通讯畅通
+2. 对风控意见逐条回复
+3. 如需修改，修改后标注修改位置
+
+【审核后】
+1. 确认所有意见已闭环
+2. 获取风控部签字确认
+3. 归档风控审核记录</div>
+          </div>
+
+          <h2><i class="ri-file-warning-line"></i>常见风控问题汇总</h2>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>问题类型</th>
+                <th>常见表现</th>
+                <th>预防措施</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tag tag-red">高风险</span></td>
+                <td>评估目的与价值类型不匹配</td>
+                <td>核对业务约定书，确认评估目的</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-red">高风险</span></td>
+                <td>权属资料缺失或瑕疵未披露</td>
+                <td>建立权属核查清单，逐一核对</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-orange">中风险</span></td>
+                <td>参数选取依据不充分</td>
+                <td>保留参数选取的过程资料</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-orange">中风险</span></td>
+                <td>可比案例信息不完整</td>
+                <td>建立案例采集标准模板</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-green">低风险</span></td>
+                <td>格式不统一、错别字</td>
+                <td>使用标准模板，交叉复核</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ========== PAGE: DAILY ========== -->
+      <div class="page-section" id="page-daily">
+        <div class="content-wrapper">
+          <div class="page-header">
+            <h1><i class="ri-newspaper-line"></i>群日报</h1>
+            <p>从群消息自动生成日报，让信息不遗漏</p>
+          </div>
+
+          <div class="info-box blue">
+            <i class="ri-robot-line"></i>
+            <div class="info-box-content">
+              <h4>自动化日报</h4>
+              <p>每天群里的消息会自动汇总生成日报。你只需要在群里正常汇报工作，系统会自动整理成结构化日报。</p>
+            </div>
+          </div>
+
+          <h2><i class="ri-chat-smile-2-line"></i>群里怎么发消息会被收录</h2>
+          <p>在群里发消息时，使用以下格式，日报系统会自动识别：</p>
+
+          <div class="template-box">
+            <div class="template-header">
+              <h4><i class="ri-message-2-line"></i>群消息格式规范</h4>
+              <button class="copy-btn" onclick="copyTemplate(this)"><i class="ri-file-copy-line"></i> 复制</button>
+            </div>
+            <div class="template-content">✅ 日报系统可以识别的格式：
+
+【项目名】+ 工作内容
+例："【XX房地产评估】今天完成了现场勘查，拍摄了30张照片"
+
+关键词触发：
+• "完成" → 计入"今日完成"
+• "问题" / "遇到" → 计入"遇到的问题"
+• "求助" / "支持" → 计入"需要的支持"
+• "明天" / "计划" → 计入"明日计划"
+
+❌ 不会被收录的消息：
+• 纯表情或纯图片
+• 与工作无关的闲聊
+• 未提及项目名的消息
+• 转发的外部链接（无描述）</div>
+          </div>
+
+          <h2><i class="ri-article-line"></i>日报自动生成示例</h2>
+          <p>以下展示系统如何从群消息自动生成日报：</p>
+
+          <div class="report-preview">
+            <h4><i class="ri-newspaper-line"></i>2026年6月7日 团队日报（自动汇总）</h4>
+
+            <div class="report-section">
+              <div class="report-section-title">📊 项目进展汇总</div>
+              <div class="report-section-content">
+                • XX房地产评估：现场勘查完成，待回办公室整理资料（张三）<br>
+                • YY设备评估：已收集80%设备清单，剩余待委托方补充（李四）<br>
+                • ZZ企业价值评估：收益法测算中，预计明天出初稿（王五）
+              </div>
+            </div>
+
+            <div class="report-section">
+              <div class="report-section-title">⚠️ 待解决问题（3个）</div>
+              <div class="report-section-content">
+                1. 【XX房地产】委托方未提供房产证复印件 — 已催促，预计明天回复（张三）<br>
+                2. 【YY设备】部分进口设备缺少报关单 — 需协调海关查询（李四）<br>
+                3. 【ZZ企业】历史财务数据有缺失 — 需要补充2019-2020年数据（王五）
+              </div>
+            </div>
+
+            <div class="report-section">
+              <div class="report-section-title">🤔 需要的支持（1个）</div>
+              <div class="report-section-content">
+                • 【YY设备】进口设备汇率取值需要确认 — 请领导帮忙确认（李四）
+              </div>
+            </div>
+
+            <div class="report-section">
+              <div class="report-section-title">📅 明日重点工作</div>
+              <div class="report-section-content">
+                • XX房地产：整理现场照片，编写勘查记录<br>
+                • YY设备：继续收集缺失资料，开始测算<br>
+                • ZZ企业：完成收益法初稿，提交内部审核
+              </div>
+            </div>
+
+            <div class="report-section">
+              <div class="report-section-title">⏰ 到期提醒</div>
+              <div class="report-section-content">
+                • XX房地产报告：距离报告日还有 3 天 ⚠️<br>
+                • YY设备报告：距离报告日还有 7 天
+              </div>
+            </div>
+          </div>
+
+          <h2><i class="ri-settings-3-line"></i>日报设置</h2>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+            <div class="form-group">
+              <label>日报生成时间</label>
+              <select>
+                <option>每天 18:00 自动生成</option>
+                <option>每天 20:00 自动生成</option>
+                <option>手动生成</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>日报接收方式</label>
+              <select>
+                <option>发送到群里</option>
+                <option>私聊发送给项目负责人</option>
+                <option>发送到邮箱</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>包含内容</label>
+              <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px;">
+                <label style="display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer;"><input type="checkbox" checked style="width: auto;"> 今日完成</label>
+                <label style="display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer;"><input type="checkbox" checked style="width: auto;"> 遇到的问题</label>
+                <label style="display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer;"><input type="checkbox" checked style="width: auto;"> 需要的支持</label>
+                <label style="display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer;"><input type="checkbox" checked style="width: auto;"> 明日计划</label>
+                <label style="display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer;"><input type="checkbox" style="width: auto;"> 到期提醒</label>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="showToast('设置已保存！')"><i class="ri-save-line"></i> 保存设置</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== PAGE: WISHLIST ========== -->
+      <div class="page-section" id="page-wishlist">
+        <div class="content-wrapper">
+          <div class="page-header">
+            <h1><i class="ri-heart-add-line"></i>心愿墙</h1>
+            <p>提出你的培训需求，一起建设学习型团队</p>
+          </div>
+
+          <div class="info-box green">
+            <i class="ri-lightbulb-line"></i>
+            <div class="info-box-content">
+              <h4>如何提出好需求</h4>
+              <p>好的培训需求 = 具体场景 + 当前困惑 + 期望收获。不要只说"我想学房地产评估"，要说"在做抵押评估时，收益法的租金取值总是把握不准，希望有案例讲解"。</p>
+            </div>
+          </div>
+
+          <h2><i class="ri-add-circle-line"></i>提交培训需求</h2>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 24px;">
+            <div class="form-group">
+              <label>培训主题</label>
+              <input type="text" placeholder="例如：房地产抵押评估实务">
+            </div>
+            <div class="form-group">
+              <label>需求类型</label>
+              <select>
+                <option>技术技能</option>
+                <option>软件工具</option>
+                <option>执业规范</option>
+                <option>沟通协作</option>
+                <option>行业知识</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>具体描述</label>
+              <textarea placeholder="请描述你在什么场景下遇到了什么困难，希望通过培训解决什么问题..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>期望形式</label>
+              <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px;">
+                <label style="display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer;"><input type="checkbox" style="width: auto;"> 内部分享会</label>
+                <label style="display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer;"><input type="checkbox" style="width: auto;"> 外部培训</label>
+                <label style="display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer;"><input type="checkbox" style="width: auto;"> 线上课程</label>
+                <label style="display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer;"><input type="checkbox" style="width: auto;"> 实操演练</label>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="showToast('心愿已提交！')"><i class="ri-send-plane-line"></i> 提交心愿</button>
+          </div>
+
+          <h2><i class="ri-fire-line"></i>热门心愿</h2>
+
+          <div class="wishlist-item">
+            <div class="wish-header">
+              <span class="wish-title"><span class="tag tag-blue">技术技能</span> 房地产收益法租金取值实务</span>
+              <button class="vote-btn voted" onclick="toggleVote(this)"><i class="ri-thumb-up-line"></i> <span>15</span></button>
+            </div>
+            <div class="wish-desc">在做收益法时，租金的选取总是很主观，希望能有系统的案例讲解，包括如何找可比案例、如何修正差异。</div>
+            <div class="wish-meta">
+              <span><i class="ri-user-line"></i> 张三</span>
+              <span><i class="ri-time-line"></i> 3天前</span>
+              <span class="tag tag-green">已安排</span>
+            </div>
+          </div>
+
+          <div class="wishlist-item">
+            <div class="wish-header">
+              <span class="wish-title"><span class="tag tag-orange">软件工具</span> Excel 高级函数在评估中的应用</span>
+              <button class="vote-btn" onclick="toggleVote(this)"><i class="ri-thumb-up-line"></i> <span>12</span></button>
+            </div>
+            <div class="wish-desc">评估工作中经常需要处理大量数据，希望学习 VLOOKUP、数据透视表、条件格式等高级功能在评估底稿中的应用。</div>
+            <div class="wish-meta">
+              <span><i class="ri-user-line"></i> 李四</span>
+              <span><i class="ri-time-line"></i> 1周前</span>
+              <span class="tag tag-orange">待安排</span>
+            </div>
+          </div>
+
+          <div class="wishlist-item">
+            <div class="wish-header">
+              <span class="wish-title"><span class="tag tag-red">执业规范</span> 报告质量提升与常见错误规避</span>
+              <button class="vote-btn" onclick="toggleVote(this)"><i class="ri-thumb-up-line"></i> <span>10</span></button>
+            </div>
+            <div class="wish-desc">风控部反馈的问题总是那些，希望能系统梳理报告中的常见错误，建立质量检查清单，减少返工。</div>
+            <div class="wish-meta">
+              <span><i class="ri-user-line"></i> 王五</span>
+              <span><i class="ri-time-line"></i> 5天前</span>
+              <span class="tag tag-orange">待安排</span>
+            </div>
+          </div>
+
+          <div class="wishlist-item">
+            <div class="wish-header">
+              <span class="wish-title"><span class="tag tag-green">行业知识</span> 新能源行业资产评估要点</span>
+              <button class="vote-btn" onclick="toggleVote(this)"><i class="ri-thumb-up-line"></i> <span>8</span></button>
+            </div>
+            <div class="wish-desc">近期接到几个新能源项目，对光伏、风电设备不熟悉，希望能了解这些资产的评估特点和注意事项。</div>
+            <div class="wish-meta">
+              <span><i class="ri-user-line"></i> 赵六</span>
+              <span><i class="ri-time-line"></i> 2天前</span>
+              <span class="tag tag-gray">投票中</span>
+            </div>
+          </div>
+
+          <div class="wishlist-item">
+            <div class="wish-header">
+              <span class="wish-title"><span class="tag tag-blue">沟通协作</span> 如何高效与客户沟通需求</span>
+              <button class="vote-btn" onclick="toggleVote(this)"><i class="ri-thumb-up-line"></i> <span>6</span></button>
+            </div>
+            <div class="wish-desc">经常遇到客户说"你们看着办"，结果做出来又不满意。希望能学习需求沟通技巧，减少反复修改。</div>
+            <div class="wish-meta">
+              <span><i class="ri-user-line"></i> 钱七</span>
+              <span><i class="ri-time-line"></i> 4天前</span>
+              <span class="tag tag-gray">投票中</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== PAGE: TRAINING ========== -->
+      <div class="page-section" id="page-training">
+        <div class="content-wrapper">
+          <div class="page-header">
+            <h1><i class="ri-book-open-line"></i>培训计划</h1>
+            <p>团队培训日历和学习资源库</p>
+          </div>
+
+          <h2><i class="ri-calendar-event-line"></i>本月培训安排</h2>
+
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>日期</th>
+                <th>主题</th>
+                <th>讲师</th>
+                <th>形式</th>
+                <th>状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>6月10日</td>
+                <td>房地产收益法租金取值实务</td>
+                <td>资深评估师 A</td>
+                <td><span class="tag tag-blue">内部分享</span></td>
+                <td><span class="status-badge pending">即将开始</span></td>
+              </tr>
+              <tr>
+                <td>6月15日</td>
+                <td>Excel 在评估工作中的高效应用</td>
+                <td>外部讲师</td>
+                <td><span class="tag tag-orange">外部培训</span></td>
+                <td><span class="status-badge pending">报名中</span></td>
+              </tr>
+              <tr>
+                <td>6月20日</td>
+                <td>机器设备评估现场勘查要点</td>
+                <td>资深评估师 B</td>
+                <td><span class="tag tag-blue">内部分享</span></td>
+                <td><span class="status-badge pending">规划中</span></td>
+              </tr>
+              <tr>
+                <td>6月5日</td>
+                <td>资产评估报告格式规范培训</td>
+                <td>风控部负责人</td>
+                <td><span class="tag tag-green">实操演练</span></td>
+                <td><span class="status-badge done">已完成</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2><i class="ri-folder-open-line"></i>学习资源库</h2>
+
+          <div class="card-grid">
+            <div class="card">
+              <div class="card-icon blue"><i class="ri-file-text-line"></i></div>
+              <h4>评估准则汇编</h4>
+              <p>资产评估基本准则、执业准则、职业道德准则完整版</p>
+              <div class="card-meta"><i class="ri-download-line"></i> PDF · 2.3MB</div>
+            </div>
+            <div class="card">
+              <div class="card-icon green"><i class="ri-video-line"></i></div>
+              <h4>内部培训录像</h4>
+              <p>2025-2026年全部内部培训录像回放</p>
+              <div class="card-meta"><i class="ri-folder-line"></i> 32 个视频</div>
+            </div>
+            <div class="card">
+              <div class="card-icon orange"><i class="ri-archive-line"></i></div>
+              <h4>案例库</h4>
+              <p>历年优秀报告案例，按资产类型分类</p>
+              <div class="card-meta"><i class="ri-folder-line"></i> 156 个案例</div>
+            </div>
+            <div class="card">
+              <div class="card-icon red"><i class="ri-error-warning-line"></i></div>
+              <h4>错误案例集</h4>
+              <p>风控部整理的常见错误案例，反面教材</p>
+              <div class="card-meta"><i class="ri-folder-line"></i> 48 个案例</div>
+            </div>
+          </div>
+
+          <h2><i class="ri-bar-chart-line"></i>团队学习统计</h2>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+            <div class="stat-row">
+              <span>本月培训场次</span>
+              <span class="stat-value">4 场</span>
+            </div>
+            <div class="stat-row">
+              <span>人均参训次数</span>
+              <span class="stat-value">2.3 次</span>
+            </div>
+            <div class="stat-row">
+              <span>培训满意度</span>
+              <span class="stat-value">4.6 / 5.0</span>
+            </div>
+            <div class="stat-row">
+              <span>学习资源下载量</span>
+              <span class="stat-value">128 次</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== PAGE: SETTINGS ========== -->
+      <div class="page-section" id="page-settings">
+        <div class="content-wrapper">
+          <div class="page-header">
+            <h1><i class="ri-settings-3-line"></i>设置</h1>
+            <p>平台个性化配置</p>
+          </div>
+
+          <h2><i class="ri-user-settings-line"></i>个人设置</h2>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px;">
+            <div class="form-group">
+              <label>显示名称</label>
+              <input type="text" value="项目负责人">
+            </div>
+            <div class="form-group">
+              <label>职位</label>
+              <select>
+                <option>项目负责人</option>
+                <option>助理评估师</option>
+                <option>评估师</option>
+                <option>风控专员</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="showToast('设置已保存！')"><i class="ri-save-line"></i> 保存</button>
+          </div>
+
+          <h2><i class="ri-notification-2-line"></i>通知设置</h2>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px;">
+            <div class="stat-row">
+              <span>新问题求助通知</span>
+              <label style="cursor: pointer;"><input type="checkbox" checked style="width: auto;"></label>
+            </div>
+            <div class="stat-row">
+              <span>日报生成通知</span>
+              <label style="cursor: pointer;"><input type="checkbox" checked style="width: auto;"></label>
+            </div>
+            <div class="stat-row">
+              <span>心愿墙投票通知</span>
+              <label style="cursor: pointer;"><input type="checkbox" style="width: auto;"></label>
+            </div>
+            <div class="stat-row">
+              <span>培训提醒</span>
+              <label style="cursor: pointer;"><input type="checkbox" checked style="width: auto;"></label>
+            </div>
+          </div>
+
+          <h2><i class="ri-palette-line"></i>外观设置</h2>
+          <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px;">
+            <div class="form-group">
+              <label>主题色</label>
+              <div style="display: flex; gap: 10px; margin-top: 6px;">
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #2563eb; cursor: pointer; border: 3px solid #2563eb;"></div>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #16a34a; cursor: pointer; border: 3px solid transparent;"></div>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #d97706; cursor: pointer; border: 3px solid transparent;"></div>
+                <div style="width: 32px; height: 32px; border-radius: 50%; background: #dc2626; cursor: pointer; border: 3px solid transparent;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== PAGE: TEAM ========== -->
+      <div class="page-section" id="page-team">
+        <div class="content-wrapper">
+          <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+            <div>
+              <h1><i class="ri-team-line"></i>团队管理</h1>
+              <p>管理团队成员信息，支持增删改查</p>
+            </div>
+            <button class="btn btn-primary" onclick="openMemberModal()">
+              <i class="ri-user-add-line"></i> 添加成员
+            </button>
+          </div>
+
+          <div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); margin-bottom: 24px;">
+            <div class="card" style="cursor: pointer;" onclick="filterMembers('all')">
+              <div class="card-icon blue"><i class="ri-team-line"></i></div>
+              <h4>总成员数</h4>
+              <p id="teamTotalCount">加载中...</p>
+            </div>
+            <div class="card" style="cursor: pointer;" onclick="filterMembers('评估师')">
+              <div class="card-icon green"><i class="ri-shield-check-line"></i></div>
+              <h4>持证评估师</h4>
+              <p id="teamCertCount">加载中...</p>
+            </div>
+            <div class="card" style="cursor: pointer;" onclick="filterMembers('评估员')">
+              <div class="card-icon orange"><i class="ri-user-star-line"></i></div>
+              <h4>评估员</h4>
+              <p id="teamStaffCount">加载中...</p>
+            </div>
+            <div class="card" style="cursor: pointer;" onclick="filterMembers('驻场')">
+              <div class="card-icon purple" style="background:#f3e8ff;color:#7c3aed;"><i class="ri-building-line"></i></div>
+              <h4>驻场人员</h4>
+              <p id="teamZfCount">加载中...</p>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+            <input type="text" id="memberSearch" placeholder="搜索姓名..." style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;flex:1;min-width:200px;" oninput="renderMembers()">
+            <select id="memberFilter" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;" onchange="renderMembers()">
+              <option value="all">全部职务</option>
+              <option value="管理层">管理层</option>
+              <option value="项目经理">项目经理</option>
+              <option value="项目主管">项目主管</option>
+              <option value="高级评估员">高级评估员</option>
+              <option value="评估员">评估员</option>
+            </select>
+            <button class="btn btn-sm" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);" onclick="refreshMembers()">
+              <i class="ri-refresh-line"></i> 刷新
+            </button>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table class="team-table" style="width:100%;border-collapse:collapse;font-size:14px;">
+              <thead>
+                <tr style="background:var(--bg-card);border-bottom:2px solid var(--border);">
+                  <th style="padding:12px;text-align:left;font-weight:600;">序号</th>
+                  <th style="padding:12px;text-align:left;font-weight:600;">姓名</th>
+                  <th style="padding:12px;text-align:left;font-weight:600;">职务</th>
+                  <th style="padding:12px;text-align:left;font-weight:600;">证书</th>
+                  <th style="padding:12px;text-align:left;font-weight:600;">备注</th>
+                  <th style="padding:12px;text-align:left;font-weight:600;">操作</th>
+                </tr>
+              </thead>
+              <tbody id="membersTableBody">
+                <tr><td colspan="6" style="padding:40px;text-align:center;color:var(--text-muted);">正在加载成员数据...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== PAGE: BOARD ========== -->
+      <div class="page-section" id="page-board">
+        <div class="content-wrapper">
+          <div class="page-header">
+            <h1><i class="ri-kanban-view-2"></i>项目进度看板</h1>
+            <p>可视化跟踪所有项目进度，一目了然</p>
+          </div>
+
+          <div class="kanban-actions">
+            <button class="btn btn-primary" onclick="openProjectModal()">
+              <i class="ri-add-line"></i> 添加项目
+            </button>
+            <button class="btn" onclick="resetBoardData()">
+              <i class="ri-refresh-line"></i> 恢复示例数据
+            </button>
+          </div>
+
+          <div class="kanban-board" id="kanbanBoard">
+            <!-- 动态渲染 -->
+          </div>
+
+          <h2><i class="ri-bar-chart-horizontal-line"></i>项目统计</h2>
+          <div class="card-grid" id="boardStats">
+            <!-- 动态渲染 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== PROJECT MODAL ====== -->
+      <div class="modal-overlay" id="projectModal">
+        <div class="modal">
+          <div class="modal-header">
+            <h3 id="modalTitle"><i class="ri-add-circle-line"></i> 添加项目</h3>
+            <button class="modal-close" onclick="closeProjectModal()">
+              <i class="ri-close-line"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="projectId">
+            <div class="form-group">
+              <label>项目名称 *</label>
+              <input type="text" id="projectName" placeholder="例如：XX房地产抵押评估">
+            </div>
+            <div class="form-group">
+              <label>委托方 *</label>
+              <input type="text" id="projectClient" placeholder="例如：XX商业银行">
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>负责人 *</label>
+                <input type="text" id="projectOwner" placeholder="例如：张三">
+              </div>
+              <div class="form-group">
+                <label>截止日期 *</label>
+                <input type="text" id="projectDeadline" placeholder="例如：6月30日">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>资产类型 *</label>
+                <select id="projectType">
+                  <option value="房地产">房地产</option>
+                  <option value="设备">设备</option>
+                  <option value="企业价值">企业价值</option>
+                  <option value="无形资产">无形资产</option>
+                  <option value="其他">其他</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>状态 *</label>
+                <select id="projectStatus">
+                  <option value="todo">待启动</option>
+                  <option value="doing">进行中</option>
+                  <option value="review">审核中</option>
+                  <option value="done">已完成</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>进度 (%)</label>
+                <input type="number" id="projectProgress" min="0" max="100" value="0" placeholder="0-100">
+              </div>
+              <div class="form-group">
+                <label>优先级</label>
+                <select id="projectPriority">
+                  <option value="常规">常规</option>
+                  <option value="高优先级">高优先级</option>
+                  <option value="紧急">紧急</option>
+                  <option value="已归档">已归档</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" onclick="closeProjectModal()">取消</button>
+            <button class="btn btn-danger" id="deleteBtn" style="display:none" onclick="deleteProject()">删除</button>
+            <button class="btn btn-primary" onclick="saveProject()">保存</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Member Modal -->
+      <div class="modal-overlay" id="memberModal">
+        <div class="modal" style="max-width: 480px;">
+          <div class="modal-header">
+            <h3 id="memberModalTitle"><i class="ri-user-add-line"></i> 添加成员</h3>
+            <button class="modal-close" onclick="closeMemberModal()">
+              <i class="ri-close-line"></i>
+            </button>
+          </div>
+          <div class="modal-body">
+            <input type="hidden" id="memberDocId">
+            <div class="form-group">
+              <label>序号 *</label>
+              <input type="number" id="memberNo" placeholder="例如：22">
+            </div>
+            <div class="form-group">
+              <label>姓名 *</label>
+              <input type="text" id="memberName" placeholder="例如：张三">
+            </div>
+            <div class="form-group">
+              <label>职务 *</label>
+              <input type="text" id="memberRole" placeholder="例如：评估员">
+            </div>
+            <div class="form-group">
+              <label>证书</label>
+              <select id="memberCert">
+                <option value="">无</option>
+                <option value="评估师">评估师</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>备注标签</label>
+              <select id="memberTag">
+                <option value="yx">雅信 (yx)</option>
+                <option value="zf">驻场 (zf)</option>
+                <option value="dz">段子 (dz)</option>
+              </select>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" onclick="closeMemberModal()">取消</button>
+            <button class="btn btn-danger" id="memberDeleteBtn" style="display:none" onclick="deleteMember()">删除</button>
+            <button class="btn btn-primary" onclick="saveMember()">保存</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ====== RIGHT TOC SIDEBAR ====== -->
+    <aside class="right-sidebar" id="rightSidebar">
+      <div class="toc-empty">加载目录中...</div>
+    </aside>
+
+  </div>
+
+  <script>
+    // ====== PAGE DATA ======
+    const sidebarData = {
+      overview: {
+        title: "项目统计",
+        items: [
+          { icon: "ri-briefcase-4-line", iconColor: "blue", title: "进行中的项目", desc: "8 个", time: "" },
+          { icon: "ri-time-line", iconColor: "orange", title: "本周到期", desc: "3 个", time: "" },
+          { icon: "ri-check-line", iconColor: "green", title: "本月已完成", desc: "12 个", time: "" },
+        ],
+        stats: [
+          { label: "团队成员", value: "20 人" },
+          { label: "助理人员", value: "12 人" },
+          { label: "本月新增项目", value: "5 个" },
+        ]
+      },
+      report: {
+        title: "待审核汇报",
+        items: [
+          { icon: "ri-file-text-line", iconColor: "orange", title: "张三 - XX房地产日报", desc: "今日完成现场勘查", time: "18:00" },
+          { icon: "ri-file-text-line", iconColor: "orange", title: "李四 - YY设备日报", desc: "资料收集进度80%", time: "17:30" },
+          { icon: "ri-file-text-line", iconColor: "orange", title: "王五 - ZZ企业周报", desc: "收益法测算中", time: "昨天" },
+        ],
+        stats: [
+          { label: "今日已汇报", value: "17 / 20" },
+          { label: "未汇报人员", value: "3 人" },
+          { label: "待处理问题", value: "5 个" },
+        ]
+      },
+      help: {
+        title: "待处理问题",
+        items: [
+          { icon: "ri-question-line", iconColor: "red", title: "XX房地产 - 房产证缺失", desc: "张三提交 · 紧急", time: "2h" },
+          { icon: "ri-question-line", iconColor: "orange", title: "YY设备 - 进口设备汇率", desc: "李四提交 · 待确认", time: "5h" },
+          { icon: "ri-question-line", iconColor: "orange", title: "ZZ企业 - 历史数据缺失", desc: "王五提交 · 需协调", time: "1d" },
+          { icon: "ri-question-line", iconColor: "gray", title: "WW房地产 - 收益法参数", desc: "赵六提交 · 一般", time: "2d" },
+          { icon: "ri-question-line", iconColor: "gray", title: "EE设备 - 折旧年限", desc: "钱七提交 · 一般", time: "3d" },
+        ],
+        stats: [
+          { label: "待处理问题", value: "5 个" },
+          { label: "紧急问题", value: "1 个" },
+          { label: "平均响应时间", value: "4.2h" },
+        ]
+      },
+      risk: {
+        title: "风控待审",
+        items: [
+          { icon: "ri-shield-check-line", iconColor: "orange", title: "XX房地产评估报告", desc: "待初审", time: "今天" },
+          { icon: "ri-shield-check-line", iconColor: "green", title: "YY设备评估报告", desc: "初审通过", time: "昨天" },
+          { icon: "ri-shield-check-line", iconColor: "blue", title: "ZZ企业价值报告", desc: "复审中", time: "2天前" },
+        ],
+        stats: [
+          { label: "待审核报告", value: "3 份" },
+          { label: "本月审核通过", value: "15 份" },
+          { label: "平均审核周期", value: "1.5 天" },
+        ]
+      },
+      daily: {
+        title: "最近日报",
+        items: [
+          { icon: "ri-newspaper-line", iconColor: "blue", title: "2026-06-07 日报", desc: "18:00 自动生成", time: "今天" },
+          { icon: "ri-newspaper-line", iconColor: "blue", title: "2026-06-06 日报", desc: "18:00 自动生成", time: "昨天" },
+          { icon: "ri-newspaper-line", iconColor: "blue", title: "2026-06-05 日报", desc: "18:00 自动生成", time: "3天前" },
+        ],
+        stats: [
+          { label: "本周日报数", value: "7 份" },
+          { label: "平均字数", value: "680 字" },
+          { label: "收录消息", value: "156 条" },
+        ]
+      },
+      wishlist: {
+        title: "热门心愿",
+        items: [
+          { icon: "ri-heart-line", iconColor: "red", title: "房地产收益法租金取值", desc: "15 人投票", time: "已安排" },
+          { icon: "ri-heart-line", iconColor: "orange", title: "Excel 高级函数应用", desc: "12 人投票", time: "待安排" },
+          { icon: "ri-heart-line", iconColor: "orange", title: "报告质量提升", desc: "10 人投票", time: "待安排" },
+        ],
+        stats: [
+          { label: "总心愿数", value: "12 个" },
+          { label: "已安排", value: "3 个" },
+          { label: "本月新增", value: "5 个" },
+        ]
+      },
+      training: {
+        title: "即将开始",
+        items: [
+          { icon: "ri-calendar-event-line", iconColor: "blue", title: "房地产收益法实务", desc: "6月10日 · 内部分享", time: "3天后" },
+          { icon: "ri-calendar-event-line", iconColor: "orange", title: "Excel 高效应用", desc: "6月15日 · 外部培训", time: "8天后" },
+        ],
+        stats: [
+          { label: "本月培训", value: "4 场" },
+          { label: "报名人数", value: "18 人" },
+          { label: "资源数", value: "236 个" },
+        ]
+      },
+      board: {
+        title: "看板统计",
+        items: [
+          { icon: "ri-briefcase-4-line", iconColor: "blue", title: "待启动", desc: "2 个项目", time: "" },
+          { icon: "ri-loader-4-line", iconColor: "orange", title: "进行中", desc: "3 个项目", time: "" },
+          { icon: "ri-eye-line", iconColor: "red", title: "审核中", desc: "2 个项目", time: "" },
+          { icon: "ri-checkbox-circle-line", iconColor: "green", title: "已完成", desc: "1 个项目", time: "" },
+        ],
+        stats: [
+          { label: "总项目数", value: "8 个" },
+          { label: "紧急项目", value: "3 个" },
+          { label: "本月完成", value: "12 个" },
+        ]
+      },
+      settings: {
+        title: "快捷操作",
+        items: [
+          { icon: "ri-user-line", iconColor: "blue", title: "个人资料", desc: "修改显示名称", time: "" },
+          { icon: "ri-notification-line", iconColor: "orange", title: "通知设置", desc: "管理消息提醒", time: "" },
+          { icon: "ri-palette-line", iconColor: "green", title: "外观设置", desc: "切换主题颜色", time: "" },
+        ],
+        stats: [
+          { label: "账号创建", value: "2025-01-15" },
+          { label: "最后登录", value: "今天" },
+          { label: "操作记录", value: "128 条" },
+        ]
+      },
+      team: {
+        title: "团队概览",
+        items: [
+          { icon: "ri-team-line", iconColor: "blue", title: "总成员", desc: "21 人", time: "" },
+          { icon: "ri-shield-check-line", iconColor: "green", title: "持证评估师", desc: "7 人", time: "" },
+          { icon: "ri-user-star-line", iconColor: "orange", title: "项目经理级", desc: "7 人", time: "" },
+        ],
+        stats: [
+          { label: "评估员", value: "4 人" },
+          { label: "高级评估员", value: "5 人" },
+          { label: "驻场人员", value: "2 人" },
+        ]
+      }
+    };
+
+    const iconColors = {
+      blue: { bg: '#dbeafe', color: '#2563eb' },
+      green: { bg: '#dcfce7', color: '#16a34a' },
+      orange: { bg: '#fef3c7', color: '#d97706' },
+      red: { bg: '#fee2e2', color: '#dc2626' },
+      gray: { bg: '#f3f4f6', color: '#6b7280' }
+    };
+
+    // ====== SWITCH PAGE ======
+    function switchPage(page) {
+      // Update nav
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.page === page) item.classList.add('active');
+      });
+
+      // Update content
+      document.querySelectorAll('.page-section').forEach(section => {
+        section.classList.remove('active');
+      });
+      document.getElementById('page-' + page).classList.add('active');
+
+      // Update header title
+      const titles = {
+        overview: '项目概览',
+        report: '项目汇报',
+        help: '问题求助',
+        risk: '风控对接',
+        board: '项目看板',
+        daily: '群日报',
+        wishlist: '心愿墙',
+        training: '培训计划',
+        settings: '设置',
+        team: '团队管理'
+      };
+      document.getElementById('headerPageTitle').textContent = titles[page] || '';
+
+      // Load data for specific pages
+      if (page === 'team') {
+        fetchMembers().then(() => renderMembers());
+      }
+
+      // Update right sidebar
+      generateTOC();
+
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ====== TABLE OF CONTENTS (RIGHT SIDEBAR) ======
+    let currentTocHeadings = [];
+
+    function generateTOC() {
+      const activePage = document.querySelector('.page-section.active');
+      const sidebar = document.getElementById('rightSidebar');
+      if (!activePage || !sidebar) return;
+
+      // Find all h2 and h3 within the active page's content-wrapper
+      const content = activePage.querySelector('.content-wrapper');
+      if (!content) {
+        sidebar.innerHTML = '<div class="toc-empty">此页面暂无目录</div>';
+        return;
+      }
+
+      const headings = Array.from(content.querySelectorAll('h2, h3'));
+      currentTocHeadings = headings;
+
+      if (headings.length === 0) {
+        sidebar.innerHTML = '<div class="toc-empty">此页面暂无目录</div>';
+        return;
+      }
+
+      // Ensure each heading has an id
+      const pagePrefix = activePage.id.replace('page-', '');
+      headings.forEach((h, idx) => {
+        if (!h.id) {
+          h.id = pagePrefix + '-heading-' + idx;
+        }
+      });
+
+      let tocHtml = '<div class="toc-container">';
+      tocHtml += '<div class="toc-title"><i class="ri-list-check" style="margin-right:4px;"></i>本页目录</div>';
+      tocHtml += '<ul class="toc-list">';
+
+      headings.forEach((h, idx) => {
+        const level = h.tagName.toLowerCase();
+        const text = h.textContent.trim();
+        tocHtml += `<li class="toc-item level-${level}"><a href="#${h.id}" onclick="scrollToHeading('${h.id}');return false;" data-heading-id="${h.id}">${escapeHtml(text)}</a></li>`;
+      });
+
+      tocHtml += '</ul></div>';
+      sidebar.innerHTML = tocHtml;
+
+      // Highlight current visible heading
+      highlightCurrentHeading();
+    }
+
+    function scrollToHeading(id) {
+      const el = document.getElementById(id);
+      if (el) {
+        const headerOffset = 80;
+        const elementPosition = el.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function highlightCurrentHeading() {
+      const headings = currentTocHeadings;
+      if (!headings.length) return;
+
+      const headerOffset = 90;
+      let currentId = null;
+
+      for (let i = headings.length - 1; i >= 0; i--) {
+        const rect = headings[i].getBoundingClientRect();
+        if (rect.top <= headerOffset) {
+          currentId = headings[i].id;
+          break;
+        }
+      }
+
+      if (!currentId && headings.length > 0) {
+        currentId = headings[0].id;
+      }
+
+      document.querySelectorAll('.toc-item a').forEach(a => {
+        a.classList.toggle('active', a.dataset.headingId === currentId);
+      });
+    }
+
+    // Scroll spy for TOC highlighting
+    let scrollTick = false;
+    window.addEventListener('scroll', () => {
+      if (!scrollTick) {
+        window.requestAnimationFrame(() => {
+          highlightCurrentHeading();
+          scrollTick = false;
+        });
+        scrollTick = true;
+      }
+    });
+
+    // ====== COLLAPSIBLE ======
+    function toggleCollapse(header) {
+      const collapsible = header.parentElement;
+      collapsible.classList.toggle('open');
+    }
+
+    // ====== COPY TEMPLATE ======
+    function copyTemplate(btn) {
+      const content = btn.closest('.template-box').querySelector('.template-content').textContent;
+      navigator.clipboard.writeText(content).then(() => {
+        showToast('已复制到剪贴板！');
+      }).catch(() => {
+        showToast('复制失败，请手动复制');
+      });
+    }
+
+    // ====== TOGGLE VOTE ======
+    function toggleVote(btn) {
+      const span = btn.querySelector('span');
+      const count = parseInt(span.textContent);
+      if (btn.classList.contains('voted')) {
+        btn.classList.remove('voted');
+        span.textContent = count - 1;
+      } else {
+        btn.classList.add('voted');
+        span.textContent = count + 1;
+        showToast('投票成功！');
+      }
+    }
+
+    // ====== TOAST ======
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // ====== THEME TOGGLE ======
+    const themeToggle = document.getElementById('themeToggle');
+    let isDark = false;
+
+    themeToggle.addEventListener('click', () => {
+      isDark = !isDark;
+      const root = document.documentElement;
+      const icon = themeToggle.querySelector('i');
+
+      if (isDark) {
+        root.style.setProperty('--bg-main', '#0f172a');
+        root.style.setProperty('--bg-sidebar', '#1e293b');
+        root.style.setProperty('--bg-hover', '#334155');
+        root.style.setProperty('--bg-card', '#1e293b');
+        root.style.setProperty('--bg-code', '#1e1e1e');
+        root.style.setProperty('--border', '#334155');
+        root.style.setProperty('--text-primary', '#f1f5f9');
+        root.style.setProperty('--text-secondary', '#94a3b8');
+        root.style.setProperty('--text-muted', '#64748b');
+        icon.className = 'ri-moon-line';
+      } else {
+        root.style.setProperty('--bg-main', '#ffffff');
+        root.style.setProperty('--bg-sidebar', '#f9f9f9');
+        root.style.setProperty('--bg-hover', '#f0f0f0');
+        root.style.setProperty('--bg-card', '#fafafa');
+        root.style.setProperty('--bg-code', '#f4f4f4');
+        root.style.setProperty('--border', '#e5e5e5');
+        root.style.setProperty('--text-primary', '#1a1a1a');
+        root.style.setProperty('--text-secondary', '#555555');
+        root.style.setProperty('--text-muted', '#999999');
+        icon.className = 'ri-sun-line';
+      }
+    });
+
+    // ====== SEARCH ======
+    function performSearch() {
+      const input = document.getElementById('globalSearch');
+      const query = input.value.trim();
+      const clearBtn = document.getElementById('searchClear');
+
+      // Clear previous highlights
+      clearSearchHighlights();
+
+      if (!query) {
+        clearBtn.style.display = 'none';
+        return;
+      }
+      clearBtn.style.display = 'flex';
+
+      const activePage = document.querySelector('.page-section.active');
+      if (!activePage) return;
+      const content = activePage.querySelector('.content-wrapper');
+      if (!content) return;
+
+      const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, null, false);
+      const textNodes = [];
+      let node;
+      while (node = walker.nextNode()) {
+        if (node.parentElement && !node.parentElement.closest('script, style, .modal, .modal-overlay')) {
+          textNodes.push(node);
+        }
+      }
+
+      let firstMatch = null;
+      const lowerQuery = query.toLowerCase();
+
+      textNodes.forEach(textNode => {
+        const text = textNode.textContent;
+        const lowerText = text.toLowerCase();
+        if (lowerText.includes(lowerQuery)) {
+          const parts = text.split(new RegExp('(' + escapeRegExp(query) + ')', 'gi'));
+          const fragment = document.createDocumentFragment();
+          parts.forEach((part, i) => {
+            if (i % 2 === 1) {
+              const span = document.createElement('span');
+              span.className = 'search-highlight';
+              span.textContent = part;
+              fragment.appendChild(span);
+              if (!firstMatch) firstMatch = span;
+            } else {
+              fragment.appendChild(document.createTextNode(part));
+            }
+          });
+          textNode.parentNode.replaceChild(fragment, textNode);
+        }
+      });
+
+      if (firstMatch) {
+        const headerOffset = 90;
+        const elementPosition = firstMatch.getBoundingClientRect().top;
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+        showToast('找到 ' + query + '，已高亮显示');
+      } else {
+        showToast('未找到 "' + query + '"');
+      }
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('globalSearch');
+      input.value = '';
+      document.getElementById('searchClear').style.display = 'none';
+      clearSearchHighlights();
+    }
+
+    function clearSearchHighlights() {
+      const activePage = document.querySelector('.page-section.active');
+      if (!activePage) return;
+      const highlights = activePage.querySelectorAll('.search-highlight');
+      highlights.forEach(span => {
+        const parent = span.parentNode;
+        parent.insertBefore(document.createTextNode(span.textContent), span);
+        parent.removeChild(span);
+        parent.normalize();
+      });
+    }
+
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    // Search input enter key
+    document.getElementById('globalSearch').addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        clearSearch();
+      }
+    });
+
+    // ====== CLOUDBASE INIT ======
+    let db = null;
+    let cloudbaseApp = null;
+    let isCloudReady = false;
+    const ENV_ID = 'my-course-site-d0guu33s29c7f661a';
+    const STORAGE_KEY = 'kanban_projects_v1';
+
+    const defaultProjects = [
+      { _id: '1', name: 'AA科技股权价值评估', client: 'AA科技股份有限公司', owner: '张三', deadline: '6月30日', type: '企业价值', status: 'todo', progress: 0, priority: '高优先级' },
+      { _id: '2', name: 'BB产业园土地评估', client: 'BB置业集团', owner: '李四', deadline: '7月15日', type: '房地产', status: 'todo', progress: 0, priority: '常规' },
+      { _id: '3', name: 'XX房地产抵押评估', client: 'XX商业银行', owner: '张三', deadline: '6月10日', type: '房地产', status: 'doing', progress: 65, priority: '紧急' },
+      { _id: '4', name: 'YY设备抵押评估', client: 'YY制造有限公司', owner: '李四', deadline: '6月14日', type: '设备', status: 'doing', progress: 40, priority: '高优先级' },
+      { _id: '5', name: 'ZZ企业价值评估', client: 'ZZ投资集团', owner: '王五', deadline: '6月20日', type: '企业价值', status: 'doing', progress: 30, priority: '常规' },
+      { _id: '6', name: 'CC商标权评估', client: 'CC品牌管理有限公司', owner: '赵六', deadline: '6月8日', type: '无形资产', status: 'review', progress: 90, priority: '高优先级' },
+      { _id: '7', name: 'DD海域使用权评估', client: 'DD港口集团', owner: '钱七', deadline: '6月12日', type: '房地产', status: 'review', progress: 85, priority: '常规' },
+      { _id: '8', name: 'EE机器设备转让评估', client: 'EE重工集团', owner: '孙八', deadline: '6月5日', type: '设备', status: 'done', progress: 100, priority: '已归档' },
+    ];
+
+    const typeTagColors = {
+      '房地产': 'tag-green',
+      '设备': 'tag-orange',
+      '企业价值': 'tag-blue',
+      '无形资产': 'tag-red',
+      '其他': 'tag-gray',
+    };
+
+    const priorityTagColors = {
+      '常规': 'tag-gray',
+      '高优先级': 'tag-orange',
+      '紧急': 'tag-red',
+      '已归档': 'tag-green',
+    };
+
+    async function initCloudBase() {
+      try {
+        cloudbaseApp = cloudbase.init({ env: ENV_ID });
+        await cloudbaseApp.auth().signInAnonymously();
+        db = cloudbaseApp.database();
+        isCloudReady = true;
+        console.log('CloudBase 初始化成功');
+        // Seed data if collection is empty
+        await seedIfEmpty();
+      } catch (err) {
+        console.warn('CloudBase 连接失败，使用本地模式：', err.message);
+        isCloudReady = false;
+      }
+    }
+
+    async function seedIfEmpty() {
+      try {
+        const res = await db.collection('projects').count();
+        if (res.total === 0) {
+          for (const p of defaultProjects) {
+            await db.collection('projects').add(p);
+          }
+          console.log('已初始化示例数据');
+        }
+      } catch (e) {
+        console.warn('数据初始化失败:', e);
+      }
+    }
+
+    function getBoardProjects() {
+      try {
+        const data = localStorage.getItem(STORAGE_KEY);
+        return data ? JSON.parse(data) : [...defaultProjects];
+      } catch {
+        return [...defaultProjects];
+      }
+    }
+
+    function saveBoardProjects(projects) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(projects));
+    }
+
+    async function fetchProjects() {
+      if (isCloudReady && db) {
+        try {
+          const res = await db.collection('projects').get();
+          return res.data.map(doc => ({ ...doc, id: doc._id }));
+        } catch (e) {
+          console.warn('云端读取失败，降级本地:', e);
+        }
+      }
+      return getBoardProjects().map(p => ({ ...p, id: p._id || p.id }));
+    }
+
+    async function addProjectCloud(data) {
+      if (isCloudReady && db) {
+        try {
+          const res = await db.collection('projects').add(data);
+          return res.id;
+        } catch (e) {
+          console.warn('云端添加失败:', e);
+        }
+      }
+      // Fallback to localStorage
+      const projects = getBoardProjects();
+      const newId = Date.now().toString();
+      projects.push({ _id: newId, ...data });
+      saveBoardProjects(projects);
+      return newId;
+    }
+
+    async function updateProjectCloud(id, data) {
+      if (isCloudReady && db) {
+        try {
+          await db.collection('projects').doc(id).update(data);
+          return true;
+        } catch (e) {
+          console.warn('云端更新失败:', e);
+        }
+      }
+      // Fallback to localStorage
+      const projects = getBoardProjects();
+      const idx = projects.findIndex(p => (p._id || p.id) === id);
+      if (idx !== -1) {
+        projects[idx] = { ...projects[idx], ...data };
+        saveBoardProjects(projects);
+      }
+      return true;
+    }
+
+    async function deleteProjectCloud(id) {
+      if (isCloudReady && db) {
+        try {
+          await db.collection('projects').doc(id).remove();
+          return true;
+        } catch (e) {
+          console.warn('云端删除失败:', e);
+        }
+      }
+      // Fallback to localStorage
+      const projects = getBoardProjects().filter(p => (p._id || p.id) !== id);
+      saveBoardProjects(projects);
+      return true;
+    }
+
+    function getOwnerInitial(name) {
+      return name ? name.charAt(0) : '?';
+    }
+
+    function getOwnerInitial(name) {
+      return name ? name.charAt(0) : '?';
+    }
+
+    // ====== MEMBERS MANAGEMENT ======
+    let allMembers = [];
+    let editingMemberId = null;
+    let currentMemberFilter = 'all';
+
+    async function fetchMembers() {
+      if (isCloudReady && db) {
+        try {
+          const res = await db.collection('members').orderBy('no', 'asc').get();
+          allMembers = res.data.map(doc => ({ ...doc, id: doc._id }));
+          return allMembers;
+        } catch (e) {
+          console.warn('读取成员失败:', e);
+        }
+      }
+      return allMembers;
+    }
+
+    async function addMemberCloud(data) {
+      if (isCloudReady && db) {
+        try {
+          const res = await db.collection('members').add(data);
+          return res.id;
+        } catch (e) {
+          console.warn('云端添加成员失败:', e);
+        }
+      }
+      return null;
+    }
+
+    async function updateMemberCloud(id, data) {
+      if (isCloudReady && db) {
+        try {
+          await db.collection('members').doc(id).update(data);
+          return true;
+        } catch (e) {
+          console.warn('云端更新成员失败:', e);
+        }
+      }
+      return false;
+    }
+
+    async function deleteMemberCloud(id) {
+      if (isCloudReady && db) {
+        try {
+          await db.collection('members').doc(id).remove();
+          return true;
+        } catch (e) {
+          console.warn('云端删除成员失败:', e);
+        }
+      }
+      return false;
+    }
+
+    function getTagLabel(tag) {
+      const map = { yx: '雅信', zf: '驻场', dz: '段子' };
+      return map[tag] || tag;
+    }
+
+    function getTagClass(tag) {
+      if (tag === 'zf') return 'badge-dz';
+      if (tag === 'dz') return 'badge-dz';
+      return 'badge-yx';
+    }
+
+    async function renderMembers() {
+      const search = document.getElementById('memberSearch')?.value?.trim() || '';
+      const roleFilter = document.getElementById('memberFilter')?.value || 'all';
+
+      let filtered = allMembers;
+
+      if (search) {
+        filtered = filtered.filter(m => m.name && m.name.includes(search));
+      }
+
+      if (roleFilter !== 'all') {
+        filtered = filtered.filter(m => m.role && m.role.includes(roleFilter));
+      }
+
+      if (currentMemberFilter !== 'all') {
+        if (currentMemberFilter === '驻场') {
+          filtered = filtered.filter(m => m.tag === 'zf');
+        } else if (currentMemberFilter === '评估师') {
+          filtered = filtered.filter(m => m.cert === '评估师');
+        } else if (currentMemberFilter === '评估员') {
+          filtered = filtered.filter(m => m.role && m.role.includes('评估员') && !m.role.includes('高级'));
+        }
+      }
+
+      const tbody = document.getElementById('membersTableBody');
+      if (!tbody) return;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="padding:40px;text-align:center;color:var(--text-muted);">没有找到匹配的成员</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(m => {
+        const tagLabel = getTagLabel(m.tag);
+        const tagClass = getTagClass(m.tag);
+        return `<tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:12px;">${m.no}</td>
+          <td style="padding:12px;font-weight:500;">${m.name}</td>
+          <td style="padding:12px;color:var(--text-secondary);">${m.role}</td>
+          <td style="padding:12px;">${m.cert || '-'}</td>
+          <td style="padding:12px;"><span class="badge ${tagClass}">${tagLabel}</span></td>
+          <td style="padding:12px;">
+            <button class="btn btn-sm" style="background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);padding:4px 10px;font-size:12px;" onclick="editMember('${m.id}')">
+              <i class="ri-edit-line"></i> 编辑
+            </button>
+            <button class="btn btn-sm" style="background:var(--bg-card);border:1px solid var(--border);color:var(--danger);padding:4px 10px;font-size:12px;margin-left:4px;" onclick="deleteMemberById('${m.id}', '${m.name}')">
+              <i class="ri-delete-bin-line"></i> 删除
+            </button>
+          </td>
+        </tr>`;
+      }).join('');
+
+      updateMemberStats();
+    }
+
+    function updateMemberStats() {
+      const total = allMembers.length;
+      const certCount = allMembers.filter(m => m.cert === '评估师').length;
+      const staffCount = allMembers.filter(m => m.role && m.role.includes('评估员') && !m.role.includes('高级')).length;
+      const zfCount = allMembers.filter(m => m.tag === 'zf').length;
+
+      const totalEl = document.getElementById('teamTotalCount');
+      const certEl = document.getElementById('teamCertCount');
+      const staffEl = document.getElementById('teamStaffCount');
+      const zfEl = document.getElementById('teamZfCount');
+      const badgeEl = document.getElementById('teamBadge');
+
+      if (totalEl) totalEl.textContent = total + ' 人';
+      if (certEl) certEl.textContent = certCount + ' 人';
+      if (staffEl) staffEl.textContent = staffCount + ' 人';
+      if (zfEl) zfEl.textContent = zfCount + ' 人';
+      if (badgeEl) badgeEl.textContent = total;
+
+      const overviewTeam = document.querySelector('#page-overview .card-grid .card:nth-child(2) p');
+      if (overviewTeam) {
+        const staff = allMembers.filter(m => m.role && (m.role.includes('评估员') || m.role.includes('助理'))).length;
+        overviewTeam.textContent = total + ' 名成员，其中 ' + staff + ' 名助理人员';
+      }
+
+      if (sidebarData.overview && sidebarData.overview.stats) {
+        sidebarData.overview.stats[0].value = total + ' 人';
+        const staff = allMembers.filter(m => m.role && (m.role.includes('评估员') || m.role.includes('助理'))).length;
+        sidebarData.overview.stats[1].value = staff + ' 人';
+      }
+
+      if (sidebarData.team) {
+        sidebarData.team.items[0].desc = total + ' 人';
+        sidebarData.team.items[1].desc = certCount + ' 人';
+        const pmCount = allMembers.filter(m => m.role && (m.role.includes('经理') || m.role.includes('主管'))).length;
+        sidebarData.team.items[2].desc = pmCount + ' 人';
+
+        const seniorStaff = allMembers.filter(m => m.role && m.role.includes('高级评估员')).length;
+        sidebarData.team.stats[0].value = staffCount + ' 人';
+        sidebarData.team.stats[1].value = seniorStaff + ' 人';
+        sidebarData.team.stats[2].value = zfCount + ' 人';
+      }
+    }
+
+    function filterMembers(type) {
+      currentMemberFilter = type;
+      renderMembers();
+      showToast(type === 'all' ? '显示全部成员' : '筛选：' + type);
+    }
+
+    async function refreshMembers() {
+      showToast('正在刷新...');
+      await fetchMembers();
+      renderMembers();
+      showToast('刷新完成！');
+    }
+
+    function openMemberModal(memberId) {
+      const modal = document.getElementById('memberModal');
+      const title = document.getElementById('memberModalTitle');
+      const deleteBtn = document.getElementById('memberDeleteBtn');
+
+      editingMemberId = memberId || null;
+
+      if (memberId) {
+        const m = allMembers.find(x => x.id === memberId);
+        if (!m) return;
+        title.innerHTML = '<i class="ri-edit-circle-line"></i> 编辑成员';
+        document.getElementById('memberDocId').value = m.id;
+        document.getElementById('memberNo').value = m.no;
+        document.getElementById('memberName').value = m.name;
+        document.getElementById('memberRole').value = m.role;
+        document.getElementById('memberCert').value = m.cert || '';
+        document.getElementById('memberTag').value = m.tag || 'yx';
+        deleteBtn.style.display = 'inline-block';
+      } else {
+        title.innerHTML = '<i class="ri-user-add-line"></i> 添加成员';
+        document.getElementById('memberDocId').value = '';
+        document.getElementById('memberNo').value = '';
+        document.getElementById('memberName').value = '';
+        document.getElementById('memberRole').value = '';
+        document.getElementById('memberCert').value = '';
+        document.getElementById('memberTag').value = 'yx';
+        deleteBtn.style.display = 'none';
+      }
+
+      modal.classList.add('show');
+    }
+
+    function closeMemberModal() {
+      document.getElementById('memberModal').classList.remove('show');
+      editingMemberId = null;
+    }
+
+    async function saveMember() {
+      const no = parseInt(document.getElementById('memberNo').value);
+      const name = document.getElementById('memberName').value.trim();
+      const role = document.getElementById('memberRole').value.trim();
+      const cert = document.getElementById('memberCert').value;
+      const tag = document.getElementById('memberTag').value;
+
+      if (!no || !name || !role) {
+        showToast('请填写必填项（序号、姓名、职务）');
+        return;
+      }
+
+      const data = { no, name, role, cert, tag };
+
+      if (editingMemberId) {
+        await updateMemberCloud(editingMemberId, data);
+        showToast('成员已更新！');
+      } else {
+        await addMemberCloud(data);
+        showToast('成员已添加！');
+      }
+
+      await fetchMembers();
+      renderMembers();
+      closeMemberModal();
+
+
+    }
+
+    async function deleteMemberById(id, name) {
+      if (!confirm('确定要删除成员「' + name + '」吗？')) return;
+      await deleteMemberCloud(id);
+      await fetchMembers();
+      renderMembers();
+      showToast('成员已删除');
+
+
+    }
+
+    async function deleteMember() {
+      if (editingMemberId) {
+        const m = allMembers.find(x => x.id === editingMemberId);
+        if (m) {
+          await deleteMemberById(editingMemberId, m.name);
+        }
+        closeMemberModal();
+      }
+    }
+
+    function editMember(memberId) {
+      openMemberModal(memberId);
+    }
+
+    document.getElementById('memberModal').addEventListener('click', function(e) {
+      if (e.target === this) closeMemberModal();
+    });
+
+    async function renderBoard() {
+      const projects = await fetchProjects();
+      const columns = {
+        todo: { title: '待启动', icon: 'ri-calendar-todo-line', iconColor: 'var(--accent)', cls: 'column-todo' },
+        doing: { title: '进行中', icon: 'ri-loader-4-line', iconColor: 'var(--warning)', cls: 'column-doing' },
+        review: { title: '审核中', icon: 'ri-eye-line', iconColor: '#f97316', cls: 'column-review' },
+        done: { title: '已完成', icon: 'ri-checkbox-circle-line', iconColor: 'var(--success)', cls: 'column-done' },
+      };
+
+      let boardHtml = '';
+      for (const [key, col] of Object.entries(columns)) {
+        const colProjects = projects.filter(p => p.status === key);
+        const cardsHtml = colProjects.length === 0
+          ? '<div class="empty-state"><i class="ri-inbox-line"></i>暂无项目</div>'
+          : colProjects.map(p => `
+            <div class="kanban-card" data-id="${p.id || p._id}">
+              <div class="kanban-card-actions">
+                <button onclick="editProject('${p.id || p._id}')" title="编辑"><i class="ri-edit-line"></i></button>
+                <button onclick="deleteProjectById('${p.id || p._id}')" title="删除"><i class="ri-delete-bin-line"></i></button>
+              </div>
+              <div class="kanban-card-header">
+                <span class="kanban-card-title">${escapeHtml(p.name)}</span>
+                <span class="tag ${typeTagColors[p.type] || 'tag-gray'}">${p.type}</span>
+              </div>
+              <div class="kanban-card-client">委托方：${escapeHtml(p.client)}</div>
+              <div class="kanban-card-meta">
+                <div class="kanban-card-owner">
+                  <div class="avatar-small">${getOwnerInitial(p.owner)}</div>
+                  <span>${escapeHtml(p.owner)}</span>
+                </div>
+                <div class="kanban-card-deadline ${isUrgent(p.deadline, p.status) ? 'urgent' : ''}"><i class="ri-time-line"></i> ${escapeHtml(p.deadline)}${isUrgent(p.deadline, p.status) ? ' ⚠️' : ''}</div>
+              </div>
+              <div class="kanban-progress">
+                <div class="kanban-progress-bar"><div class="kanban-progress-fill" style="width:${p.progress}%"></div></div>
+                <div class="kanban-progress-text">进度 ${p.progress}%</div>
+              </div>
+              <div class="kanban-card-tags">
+                <span class="tag ${priorityTagColors[p.priority] || 'tag-gray'}">${p.priority}</span>
+              </div>
+            </div>
+          `).join('');
+
+        boardHtml += `
+          <div class="kanban-column ${col.cls}">
+            <div class="kanban-column-header">
+              <span><i class="${col.icon}" style="margin-right:6px;color:${col.iconColor}"></i>${col.title}</span>
+              <span class="count">${colProjects.length}</span>
+            </div>
+            <div class="kanban-column-body">
+              ${cardsHtml}
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById('kanbanBoard').innerHTML = boardHtml;
+      renderBoardStats(projects);
+      updateBoardSidebar(projects);
+    }
+
+    function isUrgent(deadline, status) {
+      if (status === 'done') return false;
+      const urgentKeywords = ['6月5日', '6月6日', '6月7日', '6月8日', '6月9日', '6月10日'];
+      return urgentKeywords.some(k => deadline.includes(k));
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function renderBoardStats(projects) {
+      const total = projects.length;
+      const urgent = projects.filter(p => isUrgent(p.deadline, p.status)).length;
+      const doneThisMonth = projects.filter(p => p.status === 'done').length;
+      const inReview = projects.filter(p => p.status === 'review').length;
+
+      const statsHtml = `
+        <div class="card">
+          <div class="card-icon blue"><i class="ri-briefcase-4-line"></i></div>
+          <h4>总项目数</h4>
+          <p>当前在看板中跟踪 ${total} 个项目</p>
+          <div class="card-meta"><i class="ri-time-line"></i> ${isCloudReady ? '云端同步中' : '本地模式'}</div>
+        </div>
+        <div class="card">
+          <div class="card-icon orange"><i class="ri-alarm-warning-line"></i></div>
+          <h4>紧急项目</h4>
+          <p>${urgent} 个项目临近截止日期</p>
+          <div class="card-meta"><i class="ri-flag-line"></i> 需优先处理</div>
+        </div>
+        <div class="card">
+          <div class="card-icon green"><i class="ri-check-double-line"></i></div>
+          <h4>本月完成</h4>
+          <p>已完成 ${doneThisMonth} 个项目</p>
+          <div class="card-meta"><i class="ri-calendar-check-line"></i> 实时统计</div>
+        </div>
+        <div class="card">
+          <div class="card-icon red"><i class="ri-shield-check-line"></i></div>
+          <h4>审核中</h4>
+          <p>${inReview} 个项目等待风控审核</p>
+          <div class="card-meta"><i class="ri-time-line"></i> 实时统计</div>
+        </div>
+      `;
+      document.getElementById('boardStats').innerHTML = statsHtml;
+    }
+
+    function updateBoardSidebar(projects) {
+      const counts = {
+        todo: projects.filter(p => p.status === 'todo').length,
+        doing: projects.filter(p => p.status === 'doing').length,
+        review: projects.filter(p => p.status === 'review').length,
+        done: projects.filter(p => p.status === 'done').length,
+      };
+      sidebarData.board = {
+        title: "看板统计",
+        items: [
+          { icon: "ri-briefcase-4-line", iconColor: "blue", title: "待启动", desc: counts.todo + " 个项目", time: "" },
+          { icon: "ri-loader-4-line", iconColor: "orange", title: "进行中", desc: counts.doing + " 个项目", time: "" },
+          { icon: "ri-eye-line", iconColor: "red", title: "审核中", desc: counts.review + " 个项目", time: "" },
+          { icon: "ri-checkbox-circle-line", iconColor: "green", title: "已完成", desc: counts.done + " 个项目", time: "" },
+        ],
+        stats: [
+          { label: "总项目数", value: projects.length + " 个" },
+          { label: "紧急项目", value: projects.filter(p => isUrgent(p.deadline, p.status)).length + " 个" },
+          { label: "本月完成", value: projects.filter(p => p.status === 'done').length + " 个" },
+        ]
+      };
+    }
+
+    // ====== PROJECT MODAL ======
+    let editingProjectId = null;
+
+    async function openProjectModal(projectId) {
+      editingProjectId = projectId || null;
+      const modal = document.getElementById('projectModal');
+      const title = document.getElementById('modalTitle');
+      const deleteBtn = document.getElementById('deleteBtn');
+
+      if (projectId) {
+        const projects = await fetchProjects();
+        const p = projects.find(x => (x.id || x._id) === projectId);
+        if (!p) return;
+        title.innerHTML = '<i class="ri-edit-circle-line"></i> 编辑项目';
+        document.getElementById('projectName').value = p.name;
+        document.getElementById('projectClient').value = p.client;
+        document.getElementById('projectOwner').value = p.owner;
+        document.getElementById('projectDeadline').value = p.deadline;
+        document.getElementById('projectType').value = p.type;
+        document.getElementById('projectStatus').value = p.status;
+        document.getElementById('projectProgress').value = p.progress;
+        document.getElementById('projectPriority').value = p.priority;
+        deleteBtn.style.display = 'inline-block';
+      } else {
+        title.innerHTML = '<i class="ri-add-circle-line"></i> 添加项目';
+        document.getElementById('projectName').value = '';
+        document.getElementById('projectClient').value = '';
+        document.getElementById('projectOwner').value = '';
+        document.getElementById('projectDeadline').value = '';
+        document.getElementById('projectType').value = '房地产';
+        document.getElementById('projectStatus').value = 'todo';
+        document.getElementById('projectProgress').value = 0;
+        document.getElementById('projectPriority').value = '常规';
+        deleteBtn.style.display = 'none';
+      }
+
+      modal.classList.add('show');
+    }
+
+    function closeProjectModal() {
+      document.getElementById('projectModal').classList.remove('show');
+      editingProjectId = null;
+    }
+
+    async function saveProject() {
+      const name = document.getElementById('projectName').value.trim();
+      const client = document.getElementById('projectClient').value.trim();
+      const owner = document.getElementById('projectOwner').value.trim();
+      const deadline = document.getElementById('projectDeadline').value.trim();
+      const type = document.getElementById('projectType').value;
+      const status = document.getElementById('projectStatus').value;
+      const progress = parseInt(document.getElementById('projectProgress').value) || 0;
+      const priority = document.getElementById('projectPriority').value;
+
+      if (!name || !client || !owner || !deadline) {
+        showToast('请填写必填项（项目名称、委托方、负责人、截止日期）');
+        return;
+      }
+
+      const data = { name, client, owner, deadline, type, status, progress, priority };
+
+      if (editingProjectId) {
+        await updateProjectCloud(editingProjectId, data);
+        showToast('项目已更新！');
+      } else {
+        await addProjectCloud(data);
+        showToast('项目已添加！');
+      }
+
+      await renderBoard();
+      closeProjectModal();
+
+      const activePage = document.querySelector('.page-section.active');
+      if (activePage && activePage.id === 'page-board') {
+        updateRightSidebar('board');
+      }
+    }
+
+    function editProject(projectId) {
+      openProjectModal(projectId);
+    }
+
+    async function deleteProjectById(projectId) {
+      if (!confirm('确定要删除这个项目吗？')) return;
+      await deleteProjectCloud(projectId);
+      await renderBoard();
+      showToast('项目已删除');
+
+      const activePage = document.querySelector('.page-section.active');
+      if (activePage && activePage.id === 'page-board') {
+        updateRightSidebar('board');
+      }
+    }
+
+    async function deleteProject() {
+      if (editingProjectId) {
+        await deleteProjectById(editingProjectId);
+        closeProjectModal();
+      }
+    }
+
+    async function resetBoardData() {
+      if (!confirm('确定要恢复示例数据吗？当前所有项目将被重置。')) return;
+      if (isCloudReady && db) {
+        try {
+          const res = await db.collection('projects').get();
+          for (const doc of res.data) {
+            await db.collection('projects').doc(doc._id).remove();
+          }
+          for (const p of defaultProjects) {
+            await db.collection('projects').add(p);
+          }
+        } catch (e) {
+          console.warn('云端重置失败:', e);
+        }
+      }
+      localStorage.removeItem(STORAGE_KEY);
+      await renderBoard();
+      showToast('已恢复示例数据');
+
+      const activePage = document.querySelector('.page-section.active');
+      if (activePage && activePage.id === 'page-board') {
+        updateRightSidebar('board');
+      }
+    }
+
+    // Close modal on overlay click
+    document.getElementById('projectModal').addEventListener('click', function(e) {
+      if (e.target === this) closeProjectModal();
+    });
+
+    // ====== INIT ======
+    initCloudBase().then(() => {
+      renderBoard();
+      fetchMembers().then(() => {
+        renderMembers();
+        updateMemberStats();
+      });
+      generateTOC();
+    });
+    updateRightSidebar('overview');
+  </script>
+
+</body>
+</html>
